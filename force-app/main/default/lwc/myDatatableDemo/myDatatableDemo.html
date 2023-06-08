@@ -1,0 +1,40 @@
+<template>
+	<!-- <lightning-spinner alternative-text="Loading" variant="brand" size="large"
+		if:true={isShowSpinner}>
+	</lightning-spinner> -->
+
+	<!-- <div class="slds-grid slds-grid_vertical">
+		<if:true={isDisplayErrorPanel}>
+
+			<div class="slds-box slds-theme_error">
+				<p>{label.saveErrorTitle}</p>
+			</div>
+			<div>
+				<p class="slds-text-color_error slds-var-p-around_x-small">{panelErrorMessage}</p>
+			</div>
+			<div class="slds-grid slds-grid_vertical"> -->
+
+				<!-- add -->
+				<div class="slds-m-around_x-small slds-text-align_right">
+					<lightning-button-icon icon-name="utility:add" onclick={addRow}></lightning-button-icon>
+				</div>
+
+				<c-my-datatable
+					key-field="id"
+					data={opps}
+					columns={columns}
+					hide-checkbox-column="true"
+					onrowaction={handleRowAction}
+					onchange={valueChanged}>
+				</c-my-datatable>
+
+				<!-- botton -->
+				<div class="slds-m-around_x-small slds-text-align_center">
+					<lightning-button label='close' onclick={close}
+						class="slds-var-p-around_xx-small"></lightning-button>
+					<lightning-button label='save' variant="brand" onclick={onSave}
+						disabled={isNotSavable} class="slds-var-p-around_xx-small"></lightning-button>
+				</div>
+			
+		
+	</template>

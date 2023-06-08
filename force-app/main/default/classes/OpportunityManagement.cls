@@ -14,6 +14,14 @@ public with sharing class OpportunityManagement {
       LIMIT 1
     ];
   }
+  @AuraEnabled(cacheable=true)
+  public static list<Opportunity> getdata(id opportunityId) {
+    return [
+      SELECT Id, Machine__c, quantity__c, StageName
+      FROM Opportunity
+      WHERE Id = :opportunityId
+    ];
+  }
 }
 
 // @AuraEnabled

@@ -3,13 +3,14 @@ import { getObjectInfo } from "lightning/uiObjectInfoApi";
 import OPPORTUNITY_OBJECT from "@salesforce/schema/Opportunity";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import selectPickList from "@salesforce/apex/OpportunityManagement.selectPickList";
+import getdata from "@salesforce/apex/OpportunityManagement.getdata";
 import STAGENAME_FIELD from "@salesforce/schema/Opportunity.StageName";
 
 export default class MyDatatableDemo extends LightningElement {
   @api recordId;
 
   columns;
-  opps = [];
+  opps;
 
   machineLabel;
   quantityLabel;
@@ -56,6 +57,7 @@ export default class MyDatatableDemo extends LightningElement {
       console.log("getObjectInfo error:" + error);
     }
   }
+  @wire(getdata, { opportunityId: "$recordId" }) getOpp;
 
   //ラベルを取得
   getLabel(objectInfo) {
@@ -64,6 +66,7 @@ export default class MyDatatableDemo extends LightningElement {
     this.quantityLabel = objectInfo.fields.quantity__c.label;
     this.defaultRecordTypeId = objectInfo.defaultRecordTypeId;
   }
+
   //選択リストの値を所得する
   getPicklist(oppStageName, oppMachine) {
     let stageNameOptions = [];
@@ -81,33 +84,30 @@ export default class MyDatatableDemo extends LightningElement {
     this.columns = [
       {
         label: this.machineLabel,
-        fieldName: "machine__c",
         type: "machinePicklist",
         wrapText: true,
         typeAttributes: {
           label: this.machineLabel,
           options: machineOptions,
           value: { fieldName: "machine__c" },
-          recordId: { fieldName: "Id" },
-          fieldName: "machine__c",
-          emptyLabel: ""
+          recordId: { fieldName: "Id" }
         }
       },
-      { label: "台数", type: "text", fieldName: "quantity" },
+      { label: "台数", type: "text", fieldName: "quantity__c" },
       {
         label: this.StageNameLabel,
-        fieldName: "StageName",
         type: "stageNamePicklist",
         wrapText: true,
         typeAttributes: {
           label: this.StageNameLabel,
           options: stageNameOptions,
           value: { fieldName: "StageName" },
-          recordId: { fieldName: "Id" },
-          fieldName: "StageName"
+          recordId: { fieldName: "Id" }
         }
       }
     ];
+
+    this.opps = this.getOpp.data;
   }
 }
 

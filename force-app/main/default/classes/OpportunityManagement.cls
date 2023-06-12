@@ -7,13 +7,29 @@ public with sharing class OpportunityManagement {
 
   @AuraEnabled(cacheable=true)
   public static list<Opportunity> selectPickList(id opportunityId) {
+		//Machine__cの情報を取得する
+		Schema.DescribeFieldResult objFieldDescribe = Opportunity.Machine__c.getDescribe();
+		
+		// 選択リスト値の一覧を取得する。
+		List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues(); 
+
+		List<String> machineList; 
+		
+
+		for (Schema.PicklistEntry objPickList : lstPickListValues) { 
+		  objPickList.getValue();
+			objPickList.getLabel(); 
+		}
+
     return [
       SELECT Id, Machine__c, toLabel(Machine__c) label_pick
       FROM Opportunity
       WHERE Id = :opportunityId
       LIMIT 1
     ];
+
   }
+
   @AuraEnabled(cacheable=true)
   public static list<Opportunity> getdata(id opportunityId) {
     return [

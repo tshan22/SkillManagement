@@ -6,28 +6,52 @@ public with sharing class OpportunityManagement {
    */
 
   @AuraEnabled(cacheable=true)
-  public static list<Opportunity> selectPickList(id opportunityId) {
-		//Machine__cの情報を取得する
-		Schema.DescribeFieldResult objFieldDescribe = Opportunity.Machine__c.getDescribe();
-		
-		// 選択リスト値の一覧を取得する。
-		List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues(); 
+  public static List<PickListObj> selectPickList() {
+    //Machine__cの情報を取得する
+    Schema.DescribeFieldResult objFieldDescribe = Opportunity.machine__c.getDescribe();
 
-		List<String> machineList; 
-		
+    // 選択リスト値の一覧を取得する。
+    List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
+    List<PickListObj> machineList = new List<PickListObj>();
+    for (Schema.PicklistEntry objPickList : lstPickListValues) {
+      PickListObj pickList = new PickListObj(
+        objPickList.getLabel(),
+        objPickList.getValue()
+      );
 
-		for (Schema.PicklistEntry objPickList : lstPickListValues) { 
-		  objPickList.getValue();
-			objPickList.getLabel(); 
-		}
+      machineList.add(pickList);
+    }
 
-    return [
-      SELECT Id, Machine__c, toLabel(Machine__c) label_pick
-      FROM Opportunity
-      WHERE Id = :opportunityId
-      LIMIT 1
-    ];
+    return machineList;
+  }
 
+  @AuraEnabled(cacheable=true)
+  public static List<String> myPickList() {
+    //Machine__cの情報を取得する
+    Schema.DescribeFieldResult objFieldDescribe = Opportunity.machine__c.getDescribe();
+
+    // 選択リスト値の一覧を取得する。
+    List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
+    List<String> machineList = new List<String>();
+    for (Schema.PicklistEntry objPickList : lstPickListValues) {
+      String pickList = objPickList.getLabel() + objPickList.getValue();
+
+      machineList.add(pickList);
+    }
+
+    return machineList;
+  }
+
+  public with sharing class PickListObj {
+    @auraenabled
+    public string Label ;
+    @auraenabled
+    public string Value;
+
+    PickListObj(String Label, String Value) {
+      this.Label = Label;
+      this.Value = Value;
+    }
   }
 
   @AuraEnabled(cacheable=true)

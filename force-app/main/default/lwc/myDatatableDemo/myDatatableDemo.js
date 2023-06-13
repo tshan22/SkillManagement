@@ -3,6 +3,7 @@ import { getObjectInfo } from "lightning/uiObjectInfoApi";
 import OPPORTUNITY_OBJECT from "@salesforce/schema/Opportunity";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import selectPickList from "@salesforce/apex/OpportunityManagement.selectPickList";
+import myPickList from "@salesforce/apex/OpportunityManagement.myPickList";
 import getdata from "@salesforce/apex/OpportunityManagement.getdata";
 import STAGENAME_FIELD from "@salesforce/schema/Opportunity.StageName";
 
@@ -33,7 +34,11 @@ export default class MyDatatableDemo extends LightningElement {
       console.log("getObjectInfo error:" + error);
     }
   }
-
+  @wire(getdata, { opportunityId: "$recordId" }) getOpp({ data, error }) {
+    if (data) {
+      this.opps = data;
+    }
+  }
   //選択リストの値を取得する
   @wire(getPicklistValues, {
     recordTypeId: "$defaultRecordTypeId",
@@ -42,13 +47,14 @@ export default class MyDatatableDemo extends LightningElement {
   opportunityStageNamePicklist({ data, error }) {
     if (data) {
       this.oppStageName = data.values;
+      // console.log("wire--------->" + JSON.stringify(this.oppStageName));
     } else if (error) {
       console.log("選択リストの値を取得するエラー");
     }
   }
 
   //Apexメッソドを呼び出して、machine__cの情報を取得する
-  @wire(selectPickList, { opportunityId: "$recordId" })
+  @wire(selectPickList)
   opportunityItems({ data, error }) {
     if (data) {
       this.oppMachine = data;
@@ -57,7 +63,6 @@ export default class MyDatatableDemo extends LightningElement {
       console.log("getObjectInfo error:" + error);
     }
   }
-  @wire(getdata, { opportunityId: "$recordId" }) getOpp;
 
   //ラベルを取得
   getLabel(objectInfo) {
@@ -74,12 +79,14 @@ export default class MyDatatableDemo extends LightningElement {
       stageNameOptions.push({ label: e.label, value: e.value });
     });
 
-    let machineOptions = [
-      {
-        label: oppMachine[0].label_pick,
-        value: oppMachine[0].machine__c
-      }
-    ];
+    let machineOptions = [];
+    oppMachine.forEach((picklist) => {
+      machineOptions.push({
+        label: picklist.Label,
+        value: picklist.Value
+      });
+    });
+    console.log(machineOptions);
 
     this.columns = [
       {
@@ -106,8 +113,6 @@ export default class MyDatatableDemo extends LightningElement {
         }
       }
     ];
-
-    this.opps = this.getOpp.data;
   }
 }
 

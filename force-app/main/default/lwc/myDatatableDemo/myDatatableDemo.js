@@ -7,131 +7,130 @@ import getdata from "@salesforce/apex/OpportunityManagement.getdata";
 import STAGENAME_FIELD from "@salesforce/schema/Opportunity.StageName";
 
 export default class MyDatatableDemo extends LightningElement {
-  @api recordId;
+	@api recordId;
 
-  columns;
-  opps;
+	
+		columns;
+		opps;
 
+	machineLabel;
+	quantityLabel;
+	StageNameLabel;
+	defaultRecordTypeId;
 
-  machineLabel;
-  quantityLabel;
-  StageNameLabel;
-  defaultRecordTypeId;
+	objectInfo;
+	oppMachine;
+	oppStageName;
 
-  // isShowSpinner = true;
+	//Opportunityの情報を取得する
+	@wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
+	opportunityObjectInfo({ data, error }) {
+		if (data) {
+			this.objectInfo = data;
+			this.getLabel(this.objectInfo);
+		} else if (error) {
+			console.log("getObjectInfo error:" + error);
+		}
+	}
 
-  objectInfo;
-  oppMachine;
-  oppStageName;
-
-  //	Opportunityの情報を取得する
-  @wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
-  opportunityObjectInfo({ data, error }) {
-    if (data) {
-      this.objectInfo = data;
-      this.getLabel(this.objectInfo);
-    } else if (error) {
-      console.log("getObjectInfo error:" + error);
-    }
-  }
-
-  @wire(getdata, { opportunityId: "$recordId" }) 
+	//dataを取得する
+	@wire(getdata, { opportunityId: "$recordId" }) 
 	getOpp({ data, error }) {
-    if (data) {
-      this.opps = data;
-			console.log('data---------->' + data);
-			console.log('000000000');
-			console.log(this.opps);
-    }
-  }
+		if (data) {
+			this.opps = data;
+			// console.log('data---------->' + data);
+			// console.log('000000000');
+			// console.log(this.opps);
+		}
+	}
 
+	//フェースの選択リストの選択肢を取得する
+	@wire(getPicklistValues, {
+		recordTypeId: "$defaultRecordTypeId",
+		fieldApiName: STAGENAME_FIELD
+	})
+	opportunityStageNamePicklist({ data, error }) {
+		if (data) {
+			this.oppStageName = data.values;
+			// console.log("33333");
+			// console.log('data--------->'+ JSON.stringify(data));
+			// console.log("wire--------->" + JSON.stringify(this.oppStageName));
 
-  //選択リストの値を取得する
-  @wire(getPicklistValues, {
-    recordTypeId: "$defaultRecordTypeId",
-    fieldApiName: STAGENAME_FIELD
-  })
-  opportunityStageNamePicklist({ data, error }) {
-    if (data) {
-      this.oppStageName = data.values;
-			console.log("33333");
-			console.log('data--------->'+ JSON.stringify(data));
-      console.log("wire--------->" + JSON.stringify(this.oppStageName));
+		} else if (error) {
+			console.log("選択リストの値を取得するエラー");
+		}
+	}
 
-    } else if (error) {
-      console.log("選択リストの値を取得するエラー");
-    }
-  }
+		//Apexメッソドを呼び出して、machine__cの情報を取得する
+	@wire(selectPickList)
+	opportunityItems({ data, error }) {
+		if (data) {
+			this.oppMachine = data;
+			this.getPicklist(this.oppStageName, this.oppMachine);
+		} else if (error) {
+			console.log("getObjectInfo error:" + error);
+		}
+	}
 
-  //Apexメッソドを呼び出して、machine__cの情報を取得する
-  @wire(selectPickList)
-  opportunityItems({ data, error }) {
-    if (data) {
-      this.oppMachine = data;
-      this.getPicklist(this.oppStageName, this.oppMachine);
-    } else if (error) {
-      console.log("getObjectInfo error:" + error);
-    }
-  }
+	//ラベルを取得
+	getLabel(objectInfo) {
+		this.machineLabel = objectInfo.fields.machine__c.label;
+		this.StageNameLabel = objectInfo.fields.StageName.label;
+		this.quantityLabel = objectInfo.fields.quantity__c.label;
+		this.defaultRecordTypeId = objectInfo.defaultRecordTypeId;
+	}
 
-  //ラベルを取得
-  getLabel(objectInfo) {
-    this.machineLabel = objectInfo.fields.machine__c.label;
-    this.StageNameLabel = objectInfo.fields.StageName.label;
-    this.quantityLabel = objectInfo.fields.quantity__c.label;
-    this.defaultRecordTypeId = objectInfo.defaultRecordTypeId;
-  }
-
-  //選択リストの値を所得する
+	//選択リストの値を取得する
   getPicklist(oppStageName, oppMachine) {
-    let stageNameOptions = [];
-    oppStageName.forEach((e) => {
-      stageNameOptions.push({ label: e.label, value: e.value });
-    });
+			let stageNameOptions = [];
+			oppStageName.forEach((e) => {
+				stageNameOptions.push({ label: e.label, value: e.value });
+			});
 
-    let machineOptions = [];
-    oppMachine.forEach((picklist) => {
-      machineOptions.push({
-        label: picklist.Label,
-        value: picklist.Value
-      });
-    });
-    console.log(machineOptions);
+		let machineOptions = [];
+		oppMachine.forEach((picklist) => {
+			machineOptions.push({
+				label: picklist.Label,
+				value: picklist.Value
+			});
+		});
+		console.log(machineOptions);
+
 
     this.columns = [
-      {
-        label: this.machineLabel,
-        type: "machinePicklist",
-        wrapText: true,
-        typeAttributes: {
-          options: machineOptions,
-          value: { fieldName: "machine__c" },
-          recordId: { fieldName: "Id" }
-        }
-      },
-      { label: this.quantityLabel,
-				fieldName:  "quantity__c",
-			  type: "inputNumberField", 
+			{
+				label: this.machineLabel,
+				type: "machinePicklist",
 				wrapText: true,
 				typeAttributes: {
-          value: { fieldName:  "quantity__c" },
-          recordId: { fieldName: "Id" },
+					options: machineOptions,
+					value: { fieldName: "machine__c" },
+					recordId: { fieldName: "Id" }
+				}
+			},
+			{ label: this.quantityLabel,
+				fieldName:  "quantity__c",
+				type: "inputNumberField", 
+				wrapText: true,
+				typeAttributes: {
+					value: { fieldName:  "quantity__c" },
+					recordId: { fieldName: "Id" },
 					fieldName:  "quantity__c",
 					maxLength: "2"
 				}
 			},
  
-      {
-        label: this.StageNameLabel,
-        type: "stageNamePicklist",
-        wrapText: true,
-        typeAttributes: {
-          // label: this.StageNameLabel,
-          options: stageNameOptions,
-          value: { fieldName: "StageName" },
-          recordId: { fieldName: "Id" }
-        }
-      },
+			{
+				label: this.StageNameLabel,
+				type: "stageNamePicklist",
+				wrapText: true,
+				typeAttributes: {
+					// label: this.StageNameLabel,
+					options: stageNameOptions,
+					value: { fieldName: "StageName" },
+					recordId: { fieldName: "Id" }
+				}
+			},
 			{
 				type: "button-icon",
 				fixedWidth: 40,
@@ -146,6 +145,21 @@ export default class MyDatatableDemo extends LightningElement {
 
 
   }
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 	// handleChange(event){
 	// 	const value = event.details.value;

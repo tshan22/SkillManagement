@@ -1,54 +1,54 @@
 public with sharing class OpportunityManagement {
-  /**
-   * @description 機種選択リスト用の価格表エントリ取得
-   * @param opportunityId 現在開いている引合のレコードId
-   * @return 機種選択リスト用の価格表エントリ
-   */
+	/**
+	 * @description 機種選択リスト用の価格表エントリ取得
+	 * @param opportunityId 現在開いている引合のレコードId
+	 * @return 機種選択リスト用の価格表エントリ
+	 */
 
-  @AuraEnabled(cacheable=true)
-  public static List<PickListObj> selectPickList() {
-    //Machine__cの情報を取得する
-    Schema.DescribeFieldResult objFieldDescribe = Opportunity.machine__c.getDescribe();
+	@AuraEnabled(cacheable=true)
+	public static List<PickListObj> selectPickList() {
+		//Machine__cの情報を取得する
+		Schema.DescribeFieldResult objFieldDescribe = Opportunity.machine__c.getDescribe();
 
-    // 選択リスト値の一覧を取得する。
-    List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
+		// 選択リスト値の一覧を取得する。
+		List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
 		//System.debug(objFieldDescribe);getLabel、getValue、isActive、isDefualtValue
 
-    List<PickListObj> machineList = new List<PickListObj>();
-    for (Schema.PicklistEntry objPickList : lstPickListValues) {
-      PickListObj pickList = new PickListObj(
-        objPickList.getLabel(),
-        objPickList.getValue()
-      );
+		List<PickListObj> machineList = new List<PickListObj>();
+		for (Schema.PicklistEntry objPickList : lstPickListValues) {
+			PickListObj pickList = new PickListObj(
+				objPickList.getLabel(),
+				objPickList.getValue()
+			);
 			//System.debug(pickList);PickListObj:[Label=V22 GRAPHITE, Value=V22 GRAPHITE]
 
-      machineList.add(pickList);
-    }
+			machineList.add(pickList);
+		}
 
-    return machineList;
-  }
+		return machineList;
+	}
 
-  public with sharing class PickListObj {
-    @auraenabled
-    public string Label ;
+	public with sharing class PickListObj {
+		@auraenabled
+		public string Label ;
 
-    @auraenabled
-    public string Value;
+		@auraenabled
+		public string Value;
 
-    PickListObj(String Label, String Value) {
-      this.Label = Label;
-      this.Value = Value;
-    }
-  }
+		PickListObj(String Label, String Value) {
+			this.Label = Label;
+			this.Value = Value;
+		}
+	}
 
-  @AuraEnabled(cacheable=true)
-  public static list<Opportunity> getdata(id opportunityId) {
-    return [
-      SELECT Id, machine__c, quantity__c, StageName
-      FROM Opportunity
-      WHERE Id = :opportunityId
-    ];
-  }
+	@AuraEnabled(cacheable=true)
+	public static list<Opportunity> getdata(id opportunityId) {
+		return [
+			SELECT Id, machine__c, quantity__c, StageName
+			FROM Opportunity
+			WHERE Id = :opportunityId
+		];
+	}
 }
 
 // @AuraEnabled

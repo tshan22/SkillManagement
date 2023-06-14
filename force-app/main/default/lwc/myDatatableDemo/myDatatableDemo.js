@@ -3,7 +3,6 @@ import { getObjectInfo } from "lightning/uiObjectInfoApi";
 import OPPORTUNITY_OBJECT from "@salesforce/schema/Opportunity";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import selectPickList from "@salesforce/apex/OpportunityManagement.selectPickList";
-import myPickList from "@salesforce/apex/OpportunityManagement.myPickList";
 import getdata from "@salesforce/apex/OpportunityManagement.getdata";
 import STAGENAME_FIELD from "@salesforce/schema/Opportunity.StageName";
 
@@ -13,6 +12,7 @@ export default class MyDatatableDemo extends LightningElement {
   columns;
   opps;
 
+
   machineLabel;
   quantityLabel;
   StageNameLabel;
@@ -20,9 +20,9 @@ export default class MyDatatableDemo extends LightningElement {
 
   // isShowSpinner = true;
 
-  objectInfo = [];
+  objectInfo;
   oppMachine;
-  oppStageName = [];
+  oppStageName;
 
   //	Opportunityの情報を取得する
   @wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
@@ -34,11 +34,18 @@ export default class MyDatatableDemo extends LightningElement {
       console.log("getObjectInfo error:" + error);
     }
   }
-  @wire(getdata, { opportunityId: "$recordId" }) getOpp({ data, error }) {
+
+  @wire(getdata, { opportunityId: "$recordId" }) 
+	getOpp({ data, error }) {
     if (data) {
       this.opps = data;
+			console.log('data---------->' + data);
+			console.log('000000000');
+			console.log(this.opps);
     }
   }
+
+
   //選択リストの値を取得する
   @wire(getPicklistValues, {
     recordTypeId: "$defaultRecordTypeId",
@@ -47,7 +54,10 @@ export default class MyDatatableDemo extends LightningElement {
   opportunityStageNamePicklist({ data, error }) {
     if (data) {
       this.oppStageName = data.values;
-      // console.log("wire--------->" + JSON.stringify(this.oppStageName));
+			console.log("33333");
+			console.log('data--------->'+ JSON.stringify(data));
+      console.log("wire--------->" + JSON.stringify(this.oppStageName));
+
     } else if (error) {
       console.log("選択リストの値を取得するエラー");
     }
@@ -94,26 +104,55 @@ export default class MyDatatableDemo extends LightningElement {
         type: "machinePicklist",
         wrapText: true,
         typeAttributes: {
-          label: this.machineLabel,
           options: machineOptions,
           value: { fieldName: "machine__c" },
           recordId: { fieldName: "Id" }
         }
       },
-      { label: "台数", type: "text", fieldName: "quantity__c" },
+      { label: this.quantityLabel,
+				fieldName:  "quantity__c",
+			  type: "inputNumberField", 
+				wrapText: true,
+				typeAttributes: {
+          value: { fieldName:  "quantity__c" },
+          recordId: { fieldName: "Id" },
+					fieldName:  "quantity__c",
+					maxLength: "2"
+				}
+			},
+ 
       {
         label: this.StageNameLabel,
         type: "stageNamePicklist",
         wrapText: true,
         typeAttributes: {
-          label: this.StageNameLabel,
+          // label: this.StageNameLabel,
           options: stageNameOptions,
           value: { fieldName: "StageName" },
           recordId: { fieldName: "Id" }
         }
-      }
+      },
+			{
+				type: "button-icon",
+				fixedWidth: 40,
+				typeAttributes: {
+						iconName: "utility:delete",
+						name: "deleteRow",
+						disabled: { fieldName: "DisableDelete" }
+				}
+			}
     ];
+
+
+
   }
+
+	// handleChange(event){
+	// 	const value = event.details.value;
+	// 	const id = event.details.name;
+
+
+	// }
 }
 
 // connectedCallback(){

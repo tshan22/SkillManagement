@@ -20,10 +20,10 @@ export default class MyDatatable extends LightningDatatable {
       template: machinePicklist,
       typeAttributes: ["label", "options", "value", "recordId"]
     },
-    // inputNumberField: {
-    // 	template: inputNumberField,
-    // 	typeAttributes: ["recordId", "value", "fieldName", "maxLength"]
-    // },
+    inputNumberField: {
+    	template: inputNumberField,
+    	typeAttributes: ["recordId", "value", "fieldName", "maxLength"]
+    },
     stageNamePicklist: {
       template: stageNamePicklist, //main JSにtypeの名前
       typeAttributes: ["label", "options", "value", "recordId"] //main jsに定義したもの

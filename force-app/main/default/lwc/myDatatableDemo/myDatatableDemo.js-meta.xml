@@ -8,15 +8,12 @@
     <targets>
         <target>lightning__FlowScreen</target>
 				<target>lightning__HomePage</target>
-                <target>lightning__AppPage</target>
-                <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
     </targets>
 		 <targetConfigs>
-        <targetConfig
-      targets="lightning__FlowScreen"
-      category="sample category"
-    >
-            <property name="recordId" type="String" label="targetRecordId" />
+        <targetConfig targets="lightning__FlowScreen" category="sample category">
+        <property name="recordId" type="String" label="targetRecordId" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

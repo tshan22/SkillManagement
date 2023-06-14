@@ -12,29 +12,15 @@ public with sharing class OpportunityManagement {
 
     // 選択リスト値の一覧を取得する。
     List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
+		//System.debug(objFieldDescribe);getLabel、getValue、isActive、isDefualtValue
+
     List<PickListObj> machineList = new List<PickListObj>();
     for (Schema.PicklistEntry objPickList : lstPickListValues) {
       PickListObj pickList = new PickListObj(
         objPickList.getLabel(),
         objPickList.getValue()
       );
-
-      machineList.add(pickList);
-    }
-
-    return machineList;
-  }
-
-  @AuraEnabled(cacheable=true)
-  public static List<String> myPickList() {
-    //Machine__cの情報を取得する
-    Schema.DescribeFieldResult objFieldDescribe = Opportunity.machine__c.getDescribe();
-
-    // 選択リスト値の一覧を取得する。
-    List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
-    List<String> machineList = new List<String>();
-    for (Schema.PicklistEntry objPickList : lstPickListValues) {
-      String pickList = objPickList.getLabel() + objPickList.getValue();
+			//System.debug(pickList);PickListObj:[Label=V22 GRAPHITE, Value=V22 GRAPHITE]
 
       machineList.add(pickList);
     }
@@ -45,6 +31,7 @@ public with sharing class OpportunityManagement {
   public with sharing class PickListObj {
     @auraenabled
     public string Label ;
+
     @auraenabled
     public string Value;
 
@@ -57,7 +44,7 @@ public with sharing class OpportunityManagement {
   @AuraEnabled(cacheable=true)
   public static list<Opportunity> getdata(id opportunityId) {
     return [
-      SELECT Id, Machine__c, quantity__c, StageName
+      SELECT Id, machine__c, quantity__c, StageName
       FROM Opportunity
       WHERE Id = :opportunityId
     ];

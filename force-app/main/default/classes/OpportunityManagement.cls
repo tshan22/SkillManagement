@@ -5,49 +5,80 @@ public with sharing class OpportunityManagement {
 	 * @return 機種選択リスト用の価格表エントリ
 	 */
 
+
+	 //列のラベルを取得する
+	 @AuraEnabled
+	 public static string getLabel(String fieldName){
+		Schema.DescribeFieldResult columnLabel;
+			try {
+				if(fieldName == 'Product2__c'){
+					columnLabel = Schema.SObjectType.OpportunityItem__c.fields.Product2__c;
+				}else if(fieldName == 'UnitCounts__c'){
+					columnLabel = Schema.SObjectType.OpportunityItem__c.fields.UnitCounts__c;					
+				}else if(fieldName == 'StageName__c'){
+					columnLabel = Schema.SObjectType.OpportunityItem__c.fields.StageName__c;		
+				}
+				return columnLabel.getLabel();
+			} catch (Exception e) {
+				throw new AuraHandledException(e.getMessage());
+			}
+	 	}
+
+//選択肢を取得する
 	@AuraEnabled(cacheable=true)
-	public static List<PickListObj> selectPickList() {
-		//Machine__cの情報を取得する
-		Schema.DescribeFieldResult objFieldDescribe = Opportunity.machine__c.getDescribe();
+	public static List<convertPicklist> getPickList(String picklistName) {
+	  Schema.DescribeFieldResult objFieldDescribe ;
+
+		//StageName__cの情報を取得する
+		if(picklistName == 'StageName__c'){
+			objFieldDescribe = OpportunityItem__c.StageName__c.getDescribe();
+		}else if(picklistName == 'Product2__c'){
+			objFieldDescribe = OpportunityItem__c.Product2__c.getDescribe();
+		}
 
 		// 選択リスト値の一覧を取得する。
-		List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
+		List<Schema.PicklistEntry> pickListValues = objFieldDescribe.getPickListValues();
 		//System.debug(objFieldDescribe);getLabel、getValue、isActive、isDefualtValue
 
-		List<PickListObj> machineList = new List<PickListObj>();
-		for (Schema.PicklistEntry objPickList : lstPickListValues) {
-			PickListObj pickList = new PickListObj(
+
+		List<convertPicklist> pickList = new List<convertPicklist>();
+		for (Schema.PicklistEntry objPickList : pickListValues) {
+			convertPicklist convertedLists = new convertPicklist(
 				objPickList.getLabel(),
 				objPickList.getValue()
 			);
 			//System.debug(pickList);PickListObj:[Label=V22 GRAPHITE, Value=V22 GRAPHITE]
 
-			machineList.add(pickList);
+			pickList.add(convertedLists);
 		}
 
-		return machineList;
+		return pickList;
 	}
 
-	public with sharing class PickListObj {
+
+	public with sharing class convertPicklist {
 		@auraenabled
-		public string Label ;
+		public string label ;
 
 		@auraenabled
-		public string Value;
+		public string value;
 
-		PickListObj(String Label, String Value) {
-			this.Label = Label;
-			this.Value = Value;
+		convertPicklist(String label, String value) {
+			this.label = label;
+			this.value = value;
 		}
 	}
 
 	@AuraEnabled(cacheable=true)
-	public static list<Opportunity> getdata(id opportunityId) {
-		return [
-			SELECT Id, machine__c, quantity__c, StageName
-			FROM Opportunity
-			WHERE Id = :opportunityId
-		];
+	public static list<OpportunityItem__c> getdata(id opportunityId) {
+
+		return [SELECT id,Product2__c,UnitCounts__c,StageName__c FROM OpportunityItem__c WHERE Opportunity__c = :opportunityId];
+		
+		// return [
+		// 	SELECT Id, machine__c, quantity__c, StageName
+		// 	FROM Opportunity
+		// 	WHERE Id = :opportunityId
+		// ];
 	}
 }
 

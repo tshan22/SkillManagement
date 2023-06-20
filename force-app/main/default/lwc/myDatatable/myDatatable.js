@@ -3,7 +3,7 @@ import LightningDatatable from "lightning/datatable";
 import deleteRow from "./deleteRow.html";
 import inputNumberField from "./inputNumberField.html";
 import stageNamePicklist from "./stageNamePicklist.html";
-import machinePicklist from "./machinePicklist.html";
+import productPicklist from "./productPicklist.html";
 
 export default class MyDatatable extends LightningDatatable {
 	static customTypes = {
@@ -16,9 +16,9 @@ export default class MyDatatable extends LightningDatatable {
 		// 		// Provide template data here if needed
 		// 		typeAttributes: ['attrA', 'attrB'],
 		// },
-		machinePicklist: {
-			template: machinePicklist,
-			typeAttributes: ["label", "options", "value", "recordId"]
+		productPicklist: {
+			template: productPicklist,
+			typeAttributes: ["label", "options", "value", "recordId","fieldName"]
 		},
 		inputNumberField: {
 			template: inputNumberField,
@@ -26,7 +26,7 @@ export default class MyDatatable extends LightningDatatable {
 		},
 		stageNamePicklist: {
 			template: stageNamePicklist, //main JSにtypeの名前
-			typeAttributes: ["label", "options", "value", "recordId"] //main jsに定義したもの
+			typeAttributes: ["label", "options", "value", "recordId","fieldName"] //main jsに定義したもの
 		}
 	};
 

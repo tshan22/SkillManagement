@@ -1,133 +1,166 @@
 import { LightningElement, api, wire } from "lwc";
 import { getObjectInfo } from "lightning/uiObjectInfoApi";
+import { FlowNavigationFinishEvent } from "lightning/flowSupport";
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
+
+
+import { NavigationMixin } from 'lightning/navigation';
+
 import OPPORTUNITY_OBJECT from "@salesforce/schema/Opportunity";
+import OPPORTUNITY_ITEM_OBJECT from "@salesforce/schema/OpportunityItem__c";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
-import selectPickList from "@salesforce/apex/OpportunityManagement.selectPickList";
-import getdata from "@salesforce/apex/OpportunityManagement.getdata";
+
 import STAGENAME_FIELD from "@salesforce/schema/Opportunity.StageName";
+
+import getdata from "@salesforce/apex/OpportunityManagement.getdata";
+import getLabel from "@salesforce/apex/OpportunityManagement.getLabel";
+import getPickList from "@salesforce/apex/OpportunityManagement.getPickList";
+// import { formatMessage } from "../util/util";
+
+// import getOpportunityInfo from "@salesforce/apex/OpportunityManagement.getOpportunityInfo";
 
 export default class MyDatatableDemo extends LightningElement {
 	@api recordId;
 
 	
-		columns;
-		opps;
+	columns;
+	opps;
 
-	machineLabel;
-	quantityLabel;
-	StageNameLabel;
-	defaultRecordTypeId;
+	productLabel;
+	unitCountsLabel;
+	stageNameLabel;
+
+	dataLength;
 
 	objectInfo;
-	oppMachine;
-	oppStageName;
+	// oppMachine;
+	// oppStageName;
 
-	//Opportunityの情報を取得する
-	@wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
-	opportunityObjectInfo({ data, error }) {
-		if (data) {
-			this.objectInfo = data;
-			this.getLabel(this.objectInfo);
-		} else if (error) {
-			console.log("getObjectInfo error:" + error);
+ //	Opportunityの情報を取得する
+ @wire(getObjectInfo, { objectApiName: OPPORTUNITY_ITEM_OBJECT})
+ opportunityObjectInfo({ data, error }) {
+	 if (data) {
+		 this.objectInfo = data;
+		 console.log('111111111111111111111');
+		 console.log(this.objectInfo);
+	 } else if (error) {
+		 console.log("getObjectInfo error:" + error);
+	 }
+ }
+
+
+
+	async connectedCallback(){
+		try{
+			console.log('qqqqqqqqqqqqqqqqq');
+			//列のラベル名を取得する
+			this.productLabel= await getLabel({fieldName:'Product2__c'});
+			this.unitCountsLabel = await getLabel({fieldName:'UnitCounts__c'});
+			this.stageNameLabel = await getLabel({fieldName:'StageName__c'});
+
+			console.log('2222222222222--------------------------------------------------');
+			console.log(this.productLabel);
+			console.log(this.unitCountsLabel);
+			console.log(this.stageNameLabel)
+
+			//選択リストの選択肢を取得する		
+			const productPicklist = await getPickList({picklistName:'Product2__c'});
+			const stageNamePicklist = await getPickList({picklistName:'StageName__c'});
+
+			console.log('3333333333333333----------------------------------');
+			console.log('機種選択肢');
+			console.log(productPicklist);
+			console.log('フェーズ選択肢');
+			console.log(stageNamePicklist);
+
+
+			//columns
+			this.setColumns(productPicklist,stageNamePicklist);
+
+			//data
+			const opportunityItems = await getdata({opportunityId: this.recordId});
+			console.log('4444444444444---------------------------');
+			console.log(opportunityItems);
+			this.opps = opportunityItems;
+			console.log(this.opps);
+			console.log('**********************');
+			console.log(this.opps.length);//2
+			this.dataLength = this.opps.length;
+		}catch(error){
+			console.log('error is ocurred');
+			console.error(error.message);
 		}
 	}
 
 	//dataを取得する
-	@wire(getdata, { opportunityId: "$recordId" }) 
-	getOpp({ data, error }) {
-		if (data) {
-			this.opps = data;
-			// console.log('data---------->' + data);
-			// console.log('000000000');
-			// console.log(this.opps);
-		}
-	}
+	// @wire(getdata, { opportunityId: "$recordId" }) 
+	// getOpp({ data, error }) {
+	// 	if (data) {
+	// 		this.opps = data;
+	// 		// console.log('data---------->' + data);
+	// 		// console.log('000000000');
+	// 		// console.log(this.opps);
+	// 	}
+	// }
 
-	//フェースの選択リストの選択肢を取得する
-	@wire(getPicklistValues, {
-		recordTypeId: "$defaultRecordTypeId",
-		fieldApiName: STAGENAME_FIELD
-	})
-	opportunityStageNamePicklist({ data, error }) {
-		if (data) {
-			this.oppStageName = data.values;
-			// console.log("33333");
-			// console.log('data--------->'+ JSON.stringify(data));
-			// console.log("wire--------->" + JSON.stringify(this.oppStageName));
 
-		} else if (error) {
-			console.log("選択リストの値を取得するエラー");
-		}
-	}
-
-		//Apexメッソドを呼び出して、machine__cの情報を取得する
-	@wire(selectPickList)
-	opportunityItems({ data, error }) {
-		if (data) {
-			this.oppMachine = data;
-			this.getPicklist(this.oppStageName, this.oppMachine);
-		} else if (error) {
-			console.log("getObjectInfo error:" + error);
-		}
-	}
-
-	//ラベルを取得
-	getLabel(objectInfo) {
-		this.machineLabel = objectInfo.fields.machine__c.label;
-		this.StageNameLabel = objectInfo.fields.StageName.label;
-		this.quantityLabel = objectInfo.fields.quantity__c.label;
-		this.defaultRecordTypeId = objectInfo.defaultRecordTypeId;
-	}
 
 	//選択リストの値を取得する
-  getPicklist(oppStageName, oppMachine) {
-			let stageNameOptions = [];
-			oppStageName.forEach((e) => {
-				stageNameOptions.push({ label: e.label, value: e.value });
-			});
+  setColumns(productPicklist,stageNamePicklist) {	
 
-		let machineOptions = [];
-		oppMachine.forEach((picklist) => {
-			machineOptions.push({
-				label: picklist.Label,
-				value: picklist.Value
+		//Product２__c選択肢を取得
+		let productOptions = [];
+		productPicklist.forEach((e) => {
+			productOptions.push({
+				label: e.label,
+				value: e.value
+			});
+		});	
+
+		//StageName選択肢を取得
+		let stageNameOptions = [];
+		stageNamePicklist.forEach((e) => {
+			stageNameOptions.push({
+				label: e.label,
+				value: e.value
 			});
 		});
-		console.log(machineOptions);
+    
 
 
+		//colmnsを定義する
     this.columns = [
 			{
-				label: this.machineLabel,
-				type: "machinePicklist",
+				label: this.productLabel,
+				type: "productPicklist",
 				wrapText: true,
 				typeAttributes: {
-					options: machineOptions,
-					value: { fieldName: "machine__c" },
+					options: productOptions,
+					value: { fieldName: "Product2__c" },
+					fieldName:"Product2__c",
 					recordId: { fieldName: "Id" }
 				}
 			},
-			{ label: this.quantityLabel,
-				fieldName:  "quantity__c",
+			{ label: this.unitCountsLabel,
+				fieldName:  "UnitCounts__c",
 				type: "inputNumberField", 
 				wrapText: true,
 				typeAttributes: {
-					value: { fieldName:  "quantity__c" },
+					value: { fieldName:  "UnitCounts__c" },
 					recordId: { fieldName: "Id" },
-					fieldName:  "quantity__c",
+					fieldName:  "UnitCounts__c",
 					maxLength: "2"
 				}
 			},
  
 			{
-				label: this.StageNameLabel,
+				label: this.stageNameLabel,
 				type: "stageNamePicklist",
 				wrapText: true,
 				typeAttributes: {
-					// label: this.StageNameLabel,
 					options: stageNameOptions,
-					value: { fieldName: "StageName" },
+					value: { fieldName: "StageName__c" },
+					fieldName:"StageName__c",
 					recordId: { fieldName: "Id" }
 				}
 			},
@@ -141,27 +174,84 @@ export default class MyDatatableDemo extends LightningElement {
 				}
 			}
     ];
-
-
-
   }
-			
+
+	currentId = 0;
+	get nextId() {
+			this.currentId += 1;
+			return `xxx-${this.currentId}`;
+	}
+
+	addRow(){
+		const newOpportunityItem = {
+			// Id: this.nextId,
+			Opportunity__c: this.recordId,
+			Product2__c: "",
+			UnitCounts__c: "",
+			StageName__c: "",
+			DisableDelete: false
+		};
+		this.opps = [...this.opps, newOpportunityItem];
+		console.log(this.nextId);
+	}
+
+	
+
+	// deleteOpportunityItems=[];
+
+	//行を削除する
+	handleRowAction(event) {
+		const actionName = event.detail.action.name;
+		const row = event.detail.row;
+		const rowId = row.Id;
+		console.log(rowId);
+		if (actionName === "deleteRow") {
+				this.deleteRow(row);
+		}
+	}
+
+	deleteRow(row) {
+			const deleteRows = this.opps.filter((e) => e.Id === row.Id);
+			const remainRows = this.opps.filter((e) => e.Id !== row.Id);
+			console.log(JSON.stringify(remainRows));
+			console.log(row.id);
+			if (deleteRows.length > 0) {
+					this.opps = remainRows;
+					// this.deleteOpportunityItems.push(deleteRows[0]);
+			}
+	}
+
+	//値を変更
 
 
+	handleChange(event) {
+		const value = event.detail.value;
+		const recordId = event.detail.name;
+		const fieldName = event.detail.context;
+	}
+	
+
+// save(){
+// 	const fields = {};
+// 	if(this.opps.length>this.datalength){
 
 
-
-
-
-
-
+// 	}
+// }
 
 
 
 
   
 
-	// handleChange(event){
+
+  //キャンセル、フローが終わり
+	close() {
+		const navigateFinishEvent = new FlowNavigationFinishEvent();
+		this.dispatchEvent(navigateFinishEvent);
+}
+
+	// handleChange(event){ 
 	// 	const value = event.details.value;
 	// 	const id = event.details.name;
 

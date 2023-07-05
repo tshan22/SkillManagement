@@ -1,18 +1,10 @@
-<!-- <template>
-	<lightning-combobox
-		name={typeAttributes.recordId}
-		label={typeAttributes.label}
-		value={typeAttributes.value}
-		options={typeAttributes.options}>
-	</lightning-combobox>
-</template> -->
 
 <template>
 	<c-product-picklist
-		name={typeAttributes.recordId}
+		field-name={typeAttributes.fieldName}
 		label={typeAttributes.label}
 		value={typeAttributes.value}
-		event-context={typeAttributes.fieldName}
+		record-id={typeAttributes.recordId}
 		options={typeAttributes.options}>
 	</c-product-picklist>
 </template>

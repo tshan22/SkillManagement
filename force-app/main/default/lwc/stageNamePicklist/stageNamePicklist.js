@@ -1,21 +1,25 @@
 import { LightningElement,api } from 'lwc';
 
 export default class StageNamePicklist extends LightningElement {
-	@api name;
+	@api fieldName;
 	@api label;
 	@api value;
 	@api options;
-	@api eventContext;
+	@api recordId;
 
-	valueChange(event){
+	handleChange(event){
 		this.value = event.target.value;
 
-		const changeEvent = new CustomEvent("change",{
+		const changeEvent = new CustomEvent("select",{
+			bubbles: true,
+      composed: true,
+			cancelable: true,
+
 			detail:{
 				label:this.label,
-				name:this.name,
+				id:this.recordId,
 				value:this.value,
-				context:this.eventContext
+				name:this.fieldName
 			}
 		});
 		this.dispatchEvent(changeEvent);

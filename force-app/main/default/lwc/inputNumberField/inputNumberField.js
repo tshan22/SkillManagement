@@ -1,29 +1,25 @@
-import { LightningElement,api } from 'lwc';
-
-
-
+import { LightningElement, api } from "lwc";
 
 export default class InputNumberField extends LightningElement {
-    @api name;//id
-    @api value;
-    @api eventContext;
-    @api maxLength;
+  @api fieldName;
+  @api value;
+  @api recordId;
+  @api maxLength;
 
-    handleChange(event) {
-			this.value = event.target.value
-			
-    const changeEvent = new CustomEvent("change", {
-            // composed: this.eventContext != null,
-            // bubbles: this.eventContext != null,
-            // cancelable: this.eventContext != null,
-	
+  handleChange(event) {
+    this.value = event.target.value;
 
-            detail: {
-                name: this.name,
-                value: this.value,
-                context: this.eventContext
-            }
-        });
-        this.dispatchEvent(changeEvent);
-    }
+    const changeEvent = new CustomEvent("input", {
+      bubbles: true,
+      composed: true,
+			cancelable: true,
+      detail: {
+        name: this.fieldName,
+        value: this.value,
+        id: this.recordId,
+        // actionName: "input"
+      }
+    });
+    this.dispatchEvent(changeEvent);
+  }
 }

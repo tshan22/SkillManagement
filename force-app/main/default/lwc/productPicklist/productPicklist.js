@@ -1,25 +1,26 @@
-import { LightningElement,api} from 'lwc';
+import { LightningElement, api } from "lwc";
 
 export default class ProductPicklist extends LightningElement {
-	@api name;
-	@api label;
-	@api value;
-	@api options;
-	@api eventContext;
+  @api fieldName;
+  @api label;
+  @api value;
+  @api options;
+  @api recordId;
 
-	valueChange(event){
-		this.value = event.target.value;
+  handleChange(event) {
+    this.value = event.target.value;
 
-		const changeEvent = new CustomEvent("change",{
-			detail:{
-				label:this.label,
-				name:this.name,
-				value:this.value,
-				context:this.eventContext
-			}
-		});
-		this.dispatchEvent(changeEvent);
-
-	}
-
+    const changeEvent = new CustomEvent("select", {
+			bubbles: true,
+      composed: true,
+			cancelable: true,
+      detail: {
+        label: this.label,
+        name: this.fieldName,
+        value: this.value,
+        id: this.recordId
+      }
+    });
+    this.dispatchEvent(changeEvent);
+  }
 }

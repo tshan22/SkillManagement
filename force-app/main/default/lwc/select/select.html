@@ -1,3 +1,67 @@
+<!-- <template>
+	<div class={formElementClass}>
+		<label class="slds-form-element__label" for={name} if:true={hasLabel}>
+			<abbr class="slds-required" title={_label.REQUIRED} if:true={required}>*
+			</abbr>{label}
+		</label>
+		<div class="slds-form-element__control">
+			<div class="slds-select_container">
+				<select
+					class="slds-select"
+					name={name}
+					id={name}
+					title={selectedLabel}
+					disabled={disabled}
+					required={required}
+					onchange={handleChange}
+					onblur={handleBlur}>
+					<option value="" if:true={hasEmptyLabel} selected={emptySelected}>{emptyLabel}</option>
+					<template if:true={isGroup}>
+						<optgroup for:each={optgroupWithSelected} for:item="g" label={g.label}
+							key={g.key}>
+							<option
+								for:each={g.options}
+								for:item="e"
+								value={e.value}
+								key={e.key}
+								disabled={e.disabled}
+								selected={e.selected}>
+								{e.label}
+							</option>
+						</optgroup>
+					</template>
+					<template if:false={isGroup}>
+						<option
+							for:each={optionsWithSelected}
+							for:item="e"
+							value={e.value}
+							key={e.key}
+							disabled={e.disabled}
+							selected={e.selected}>
+							{e.label}
+						</option>
+					</template>
+				</select>
+			</div>
+		</div>
+		<ul class="slds-listbox slds-listbox_horizontal slds-m-top_xx-small"
+			if:true={hasValues}>
+			<template for:each={valueWithLabel} for:item="e">
+				<li class="slds-listbox-item" key={e.value}>
+					<lightning-pill label={e.label} onremove={removeValue} name={e.value}></lightning-pill>
+				</li>
+			</template>
+		</ul>
+		<div class="slds-form-element__help" if:true={showError}>{errorMessage}</div>
+	</div>
+</template> -->
 <template>
-    
+	<div>
+		<lightning-input
+			type="text"
+			value={filedValue}
+			onchange={handleChange}>
+		</lightning-input>
+	</div>
+
 </template>

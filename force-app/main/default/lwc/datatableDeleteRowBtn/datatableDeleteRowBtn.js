@@ -7,25 +7,26 @@ import template from './datatableDeleteRowBtn.html';
 
 // export default class DatatableDeleteRowBtn extends baseNavigation(LightningElement) {
 export default class DatatableDeleteRowBtn extends LightningElement {
-    @api rowId;
-    @api attrA;
-    @api attrB;
+    @api recordId;
+	  @api iconName;
+    @api name;
+    @api disabled;
 
     // Required for mixins
     render() {
         return template;
     }
 
-    fireDeleteRow() {
-      window.console.log(baseNavigation);
-        const event = CustomEvent('deleterow', {
-            composed: true,
-            bubbles: true,
-            cancelable: true,
-            detail: {
-                rowId: this.rowId,
-            },
-        });
-        this.dispatchEvent(event);
-    }
+    fireDeleteRow() {    
+			const clickEvent = CustomEvent('deleterow', {
+					composed: true,
+					bubbles: true,
+					cancelable: true,
+					detail: {
+							id: this.recordId,
+							name:this.name,
+					},
+			});
+			this.dispatchEvent(clickEvent );
+		}   
 }

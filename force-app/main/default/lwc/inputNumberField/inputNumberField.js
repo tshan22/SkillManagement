@@ -9,7 +9,7 @@ export default class InputNumberField extends LightningElement {
   handleChange(event) {
     this.value = event.target.value;
 
-    const changeEvent = new CustomEvent("input", {
+    const changeEvent = new CustomEvent("change", {
       bubbles: true,
       composed: true,
 			cancelable: true,

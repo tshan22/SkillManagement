@@ -1,25 +1,35 @@
-	import { LightningElement, api, wire} from "lwc";
-	import { FlowNavigationFinishEvent } from "lightning/flowSupport";
-	import { refreshApex } from '@salesforce/apex';
-	import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import { LightningElement, api, wire } from "lwc";
+import { FlowNavigationFinishEvent } from "lightning/flowSupport";
+import { refreshApex } from '@salesforce/apex';
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
-	import { getObjectInfo } from "lightning/uiObjectInfoApi";
-	import { deleteRecord } from "lightning/uiRecordApi";
-	import {notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
-	import { getRecordNotifyChange } from "lightning/uiRecordApi";
+import { getObjectInfo } from "lightning/uiObjectInfoApi";
+import { deleteRecord } from "lightning/uiRecordApi";
+import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
+import { getRecordNotifyChange } from "lightning/uiRecordApi";
 
-	import OPPORTUNITY_OBJECT from "@salesforce/schema/Opportunity";
-	import OPPORTUNITY_ITEM_OBJECT from "@salesforce/schema/OpportunityItem__c";
-	import { getPicklistValues } from "lightning/uiObjectInfoApi";
-	import STAGENAME_FIELD from "@salesforce/schema/Opportunity.StageName";
+import OPPORTUNITY_OBJECT from "@salesforce/schema/Opportunity";
+import OPPORTUNITY_ITEM_OBJECT from "@salesforce/schema/OpportunityItem__c";
+import { getPicklistValues } from "lightning/uiObjectInfoApi";
+import STAGENAME_FIELD from "@salesforce/schema/Opportunity.StageName";
 
-	import getData from "@salesforce/apex/OpportunityManagement.getData";
-	import getLabel from "@salesforce/apex/OpportunityManagement.getLabel";
-	import getStageNamePickList from "@salesforce/apex/OpportunityManagement.getStageNamePickList";
-	import getProductPickList from "@salesforce/apex/OpportunityManagement.getProductPickList";
-	import updateItem from "@salesforce/apex/OpportunityManagement.updateItem";
+import getData from "@salesforce/apex/OpportunityManagement.getData";
+import getLabel from "@salesforce/apex/OpportunityManagement.getLabel";
+import getStageNamePickList from "@salesforce/apex/OpportunityManagement.getStageNamePickList";
+import getProductPickList from "@salesforce/apex/OpportunityManagement.getProductPickList";
+import updateItem from "@salesforce/apex/OpportunityManagement.updateItem";
 
-	export default class MyDatatableDemo extends LightningElement {
+
+
+const toastInfo = {
+	success: { title: "sucess", message: "更新しました", variant: "success" },
+	error: { title: "error", message: "エラー発生しました", variant: "error" }
+};
+
+
+
+export default class MyDatatableDemo extends LightningElement {
+
 	@api recordId;
 	columns;
 	opportunityItems;
@@ -29,9 +39,17 @@
 	unitCountsLabel;
 	stageNameLabel;
 
+	//選択肢
+	productOptions = [];
+	stageNameOptions = [];
 
-//datatable更新のため
+	//datatable更新のため
 	resultOpportunityItems = [];
+	//削除された行
+	deleteOpportunityItems = [];
+	//追加する行のIDのため
+	count = 1;
+
 
 
 	async connectedCallback() {
@@ -50,14 +68,19 @@
 			const productPicklist = await getProductPickList();
 			const stageNamePicklist = await getStageNamePickList();
 
+			// console.log('mae:',this.productOptions);
 			// console.log('3333333333333333----------------------------------');
 			// console.log('機種選択肢');
 			// console.log(productPicklist);
 			// console.log('フェーズ選択肢');
 			// console.log(stageNamePicklist);
 
-			//columns
-			this.setColumns(productPicklist, stageNamePicklist);
+			//optionsをセットする
+			this.setOptions(productPicklist, stageNamePicklist);
+
+			//Cloumns
+			this.setColumns();
+
 
 			//data
 			// const opportunityItems = await getData({ opportunityId: this.recordId });
@@ -69,47 +92,47 @@
 			console.error(error.message);
 		}
 	}
-		//data
-		@wire(getData,{'opportunityId': '$recordId'})
-		wiredOpportunityItems(result){
-			this.resultOpportunityItems = result;
-			// console.log('111111111',result);
-			if(result.data){
-				this.opportunityItems = result.data;
-			}else if( result.error ){
-				console.log('error');
-			}			
+	//data
+	@wire(getData, { 'opportunityId': '$recordId' })
+	wiredOpportunityItems(result) {
+		this.resultOpportunityItems = result;
+		if (result.data) {
+			this.opportunityItems = result.data;
+		} else if (result.error) {
+			console.log('error');
 		}
+	}
 
 
 	//選択リストの値を取得する
-	setColumns(productPicklist, stageNamePicklist) {
+	setOptions(productPicklist, stageNamePicklist) {
 		//Product２__c選択肢を取得
-		let productOptions = [];
 		productPicklist.forEach((e) => {
-			productOptions.push({
+			this.productOptions.push({
 				label: e.Name,
 				value: e.Id
 			});
 		});
-
 		//StageName選択肢を取得
-		let stageNameOptions = [];
 		stageNamePicklist.forEach((e) => {
-			stageNameOptions.push({
+			this.stageNameOptions.push({
 				label: e.label,
 				value: e.value
 			});
-		});
+		})
+	}
 
-		//colmnsを定義する
+
+
+	//colmnsを定義する
+	setColumns() {
 		this.columns = [
 			{
 				label: this.productLabel,
 				type: "productPicklist",
 				wrapText: true,
 				typeAttributes: {
-					options: productOptions,
+					options: this.productOptions,
 					value: { fieldName: "Product2__c" },
 					fieldName: "Product2__c",
 					recordId: { fieldName: "Id" }
@@ -127,19 +150,17 @@
 					maxLength: "2"
 				}
 			},
-
 			{
 				label: this.stageNameLabel,
 				type: "stageNamePicklist",
 				wrapText: true,
 				typeAttributes: {
-					options: stageNameOptions,
+					options: this.stageNameOptions,
 					value: { fieldName: "StageName__c" },
 					fieldName: "StageName__c",
 					recordId: { fieldName: "Id" }
 				}
 			},
-
 			{
 				type: "button-icon",
 				fixedWidth: 40,
@@ -149,13 +170,10 @@
 					disabled: { fieldName: "DisableDelete" }
 				}
 			}
-		];
+		]
 	}
 
-
-	//追加する行のIDのため
-	count = 1;
-
+	//datatableの行を追加する
 	addRow() {
 		const newOpportunityItem = {
 			Opportunity__c: this.recordId,
@@ -168,10 +186,7 @@
 		this.count++;
 	}
 
-	//削除された行
-	deleteOpportunityItems = [];
-
-	行を削除する
+	//行を削除する
 	handleRowAction(event) {
 		const actionName = event.detail.action.name;
 		const row = event.detail.row;
@@ -179,15 +194,15 @@
 			this.deleteRow(row);
 		}
 	}
-		deleteRow(row) {
+	deleteRow(row) {
 		const deleteRows = this.opportunityItems.filter((e) => e.Id === row.Id);
 		const remainRows = this.opportunityItems.filter((e) => e.Id !== row.Id);
-		console.log(deleteRows.length);
-		if(deleteRows.length > 0){
+		// console.log(deleteRows.length);
+		if (deleteRows.length > 0) {
 			this.opportunityItems = remainRows;
 			// console.log(remainRows);
 			// console.log('AND');
-			console.log('delete rows:',deleteRows[0]);
+			console.log('delete rows:', deleteRows[0]);
 			this.deleteOpportunityItems.push(deleteRows[0]);
 		}
 
@@ -199,28 +214,28 @@
 	}
 
 	//値を変更
-	valueChange(event) {
-		const value = event.detail.value;
-		const recordId = event.detail.id;
-		const fieldName = event.detail.name;
+	handleChange(event) {
+		// const value = event.detail.value;
+		// const recordId = event.detail.id;
+		// const fieldName = event.detail.name;
 
 		let data = this.opportunityItems.map((item) => {
 			return { ...item };
 		});
-		// const updateRows = this.data.filter((e) => e.Id === recordId);	
 
+		// const updateRows = data.filter((e) => e.Id === recordId);	
+		const { value, id, name } = event.detail;
 
 		this.opportunityItems = data.map((record) => {
-			if (record.Id === recordId) {
-				record[fieldName] = value;
+			if (record.Id === id) {
+				record[name] = value;
 			}
-
 			return { ...record };
 		});
 	}
-	
 
-	//SAVE
+
+	//保存ボタン押す
 	save() {
 		//upsert
 		this.opportunityItems.map((record) => {
@@ -230,84 +245,32 @@
 			return record;
 		});
 
-		updateItem({ items: this.opportunityItems,deleteOpportunityItems:this.deleteOpportunityItems})
+		updateItem({ items: this.opportunityItems, deleteOpportunityItems: this.deleteOpportunityItems })
 			.then(() => {
-				// this.opps = result;
-				// this.idItems = result;
-				// console.log('ids:',idItems);
-				// console.log('result:',result);	
-				// console.log('length:',result.length);
-
-				// result.forEach(e =>{
-				// 	console.log('aaaaaaa:',e.Id);
-				// 	this.idItems.push(e.Id)
-				// })  
-				// console.log('ids:',JSON.stringify(this.idItems));
-				// notifyRecordUpdateAvailable(this.idItems);			  
-				// this.opps = result;		
-				// console.log(this.opps);
-				// console.log('opps:',JSON.stringify(this.opps));	
-
 				refreshApex(this.resultOpportunityItems);
 
-				this.dispatchEvent(
-					new ShowToastEvent({
-										title: 'Success',
-										message: '更新済',
-										variant: 'success'
-					})
-				)
-				this.close(); 
-
+				this.startToast(toastInfo.success);
+				this.close();
 			})
-			.catch((error) => {
-				this.dispatchEvent(
-						new ShowToastEvent({
-								title: 'Error update record',
-								message: error.body.message,
-								variant: 'error'
-						})
-				);
-			});	
-		
-			//delete
-		// if(this.deleteOpportunityItems.length > 0){
-		// 	this.deleteOpportunityItems.map((record) =>{
-		// 		// console.log('hahahahahahahahahahahah');
-		// 		// console.log(record.Id);
-		// 		// console.log(record.Product2__c);
-		// 		deleteRecord(record.Id)
-		// 			.then(() => {
-		// 				refreshApex(this.resultOpportunityItems);
-		// 				this.dispatchEvent(
-		// 						new ShowToastEvent({
-		// 								title: 'Success',
-		// 								message: 'レコードが削除されました',
-		// 								variant: 'success'
-		// 						})
-		// 				);					
-		// 				this.close();
-		// 			})
-		// 			.catch((error) => {
-		// 				this.dispatchEvent(
-		// 						new ShowToastEvent({
-		// 								title: 'Error deleting record',
-		// 								message: error.body.message,
-		// 								variant: 'error'
-		// 						})
-		// 				);
-		// 			});
+			.catch(() => {
+				this.startToast(toastInfo.error);
+			});
 
-		// 	})	
-		// }
 	}
+	startToast(info) {
+		this.dispatchEvent(
+			new ShowToastEvent({
+				title: info.title,
+				message: info.message,
+				variant: info.variant
+			})
+		)
+	};
+
 
 	//キャンセル、フローが終わり
 	close() {
 		const navigateFinishEvent = new FlowNavigationFinishEvent();
-		this.dispatchEvent(navigateFinishEvent);	
+		this.dispatchEvent(navigateFinishEvent);
 	}
-
-	}
-
-
+}

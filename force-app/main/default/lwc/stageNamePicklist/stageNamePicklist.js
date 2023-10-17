@@ -10,7 +10,7 @@ export default class StageNamePicklist extends LightningElement {
 	handleChange(event){
 		this.value = event.target.value;
 
-		const changeEvent = new CustomEvent("select",{
+		const changeEvent = new CustomEvent("change",{
 			bubbles: true,
       composed: true,
 			cancelable: true,

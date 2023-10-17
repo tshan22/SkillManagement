@@ -13,8 +13,7 @@
 				columns={columns}
 				hide-checkbox-column="true"
 				onrowaction={handleRowAction}
-				oninput={valueChange}
-				onselect={valueChange}>
+				onchange={handleChange}>
 			</c-my-datatable>
 		</div>
 
@@ -23,7 +22,7 @@
 			<lightning-button label='キャンセル' onclick={close}
 				class="slds-var-p-around_xx-small"></lightning-button>
 			<lightning-button label='保存' variant="brand" onclick={save}
-				disabled={isNotSavable} class="slds-var-p-around_xx-small"></lightning-button>
+				class="slds-var-p-around_xx-small"></lightning-button>
 		</div>
 	</div>
 

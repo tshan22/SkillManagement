@@ -1,0 +1,55 @@
+<template>
+	<div class="slds-modal__content slds-p-around_medium" onsuccess={handleSuccess}>
+		<lightning-record-edit-form object-api-name={objectApiName}>
+			<div class="slds-grid">
+				<div class="slds-col slds-size_1-of-2">
+					<lightning-input-field field-name={seminar} value={recordId}
+						onchange={handleChange}></lightning-input-field>
+				</div>
+				<div class="slds-col slds-size_1-of-2">
+					<lightning-input-field field-name={form} value={formValue}
+						onchange={handleChange1}></lightning-input-field>
+				</div>
+			</div>
+
+			<div class="slds-grid">
+				<div class="slds-col slds-size_1-of-2">
+					<lightning-input-field field-name={venue} value={venueValue}
+						onchange={handleChange2}></lightning-input-field>
+				</div>
+				<div class="slds-col slds-size_1-of-2">
+					<lightning-input-field field-name={date} value={dateValue}
+						onchange={handleChange3}></lightning-input-field>
+				</div>
+			</div>
+
+			<div class="slds-grid">
+				<div class="slds-col slds-size_1-of-2">
+					<lightning-input-field field-name={timeFrom} value={timeFromValue}
+						onchange={handleChange4}></lightning-input-field>
+				</div>
+				<div class="slds-col slds-size_1-of-2">
+					<lightning-input-field field-name={timeEnd} value={timeEndValue}
+						onchange={handleChange5}></lightning-input-field>
+				</div>
+			</div>
+
+			<div class="slds-m-around_x-small slds-text-align_center">
+				<lightning-button
+					class="slds-var-p-around_xx-small"
+					variant="brand"
+					label="キャンセル"
+					onclick={Cancel}>
+				</lightning-button>
+				<lightning-button
+					class="slds-var-p-around_xx-small"
+					variant="brand"
+					label="登録"
+					onclick={save}>
+				</lightning-button>
+
+			</div>
+
+		</lightning-record-edit-form>
+	</div>
+</template>

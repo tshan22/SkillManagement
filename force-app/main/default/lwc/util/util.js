@@ -420,6 +420,42 @@ function camelize(x) {
     return x[0].toUpperCase() + x.substring(1).replace(/_+([^_])/gi, (match, p1) => p1.toUpperCase());
 }
 
+// const col = [
+// 	{label : '従業員名',fieldName: 'employeeName',format: (row) => row.employeeName__r.Name},
+// 	{label: '役割',fieldName:POSITION_FIELD.fieldApiName},
+// 	{label : '保有資格',fieldName: CERTIFICATION_FIELD.fieldApiName},
+// 	{label:'受講履歴',fieldName:'seminarHistory',format:(row)=>row.employees__r.seminarName__c + row.employees__r.ConcreteDateTime__c }
+// ]
+// 		return [SELECT id,Name,employeeName__r.Name,(SELECT seminarName__c,ConcreteDateTime__c FROM employees__r),OwnedCertification__c,Position__c FROM employee__c];
+
+function toTable(records, columns) {
+	if (records == null) {
+			return records;
+	}
+	const table = [];
+	for (const record of records) {
+			const row = { ...record };       
+			for (const e of columns) {
+					if (e.format) {
+							row[e.fieldName] = e.format(row);
+							console.log(e.fieldName,':',row[e.fieldName]);
+							
+							// if(e.fieldName == 'seminarHistory'){
+							// 	console.log('semihis:',e.format(row));
+							// 	const ff = row[e.fieldName];		
+							// 	console.log('ff:',ff)				
+							// 	for(let i =0;i<ff.length;i++){
+
+							// 	}		
+							// 	// row[e.fieldName] = ff.seminarName__c + ff.ConcreteDateTime__c							
+						}
+			}
+			table.push(row);	
+	}
+	return table;
+
+}
+
 export {
     Deferred,
     Awaiter,
@@ -448,5 +484,6 @@ export {
     intersection,
     keyBy,
     groupBy,
-    camelize
+    camelize,
+		toTable
 };

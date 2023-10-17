@@ -1,0 +1,30 @@
+<template>
+
+	<div class="slds-grid slds-grid_vertical">
+
+		<div class="slds-scrollable_y" label='セミナを選択してください'>
+			<lightning-datatable
+				key-field="id"
+				data={seminarInfos}
+				columns={columns}
+				selected-rows={selectedRows}
+				onrowselection={handleRowSelection}>
+			</lightning-datatable>
+		</div>
+
+		<div class="slds-m-around_x-small slds-text-align_right">
+			<lightning-button label='前へ' variant="brand" onclick={back}
+				class="slds-var-p-around_xx-small"></lightning-button>
+			<lightning-button label='次へ' variant="brand" onclick={next}
+				class="slds-var-p-around_xx-small"></lightning-button>
+		</div>
+	</div>
+
+	<!-- <div class="slds-scrollable_y" style="height: 300px">
+		<c-schedule-select
+			if:true={dateSelect}
+			schedule-infos={scheduleInfos}>
+		</c-schedule-select>
+	</div> -->
+
+</template>

@@ -1,0 +1,40 @@
+<template>
+	<lightning-card title="セミナ申込">
+		<div class="slds-m-top_medium">
+			<div>
+				<lightning-input class="slds-p-horizontal_small" label='セミナを検索'
+					if:true={searchStep}
+					type="text"
+					placeholder="キーワードを入力"
+					value={fieldValue}
+					onchange={handleChange}>
+				</lightning-input>
+			</div>
+
+			<div class="slds-m-around_x-small slds-text-align_right"
+				if:true={buttonDisplay}>
+				<lightning-button label='検索' onclick={toSearchResultPage}
+					class="slds-var-p-around_xx-small"></lightning-button>
+			</div>
+
+			<div class="slds-scrollable_y">
+				<c-seminar-data-table
+					if:true={seminarDatatable}
+					seminar-infos={data}
+					onbackstep={backToPreviousPage}
+					onnextstep={toNextPage}>
+				</c-seminar-data-table>
+			</div>
+
+			<div class="slds-scrollable_y">
+				<c-schedule-select
+					if:true={dateSelect}
+					schedule-infos={scheduleInfos}
+					onbackstep={backToPreviousPage}
+					>
+				</c-schedule-select>
+			</div>
+
+		</div>
+	</lightning-card>
+</template>

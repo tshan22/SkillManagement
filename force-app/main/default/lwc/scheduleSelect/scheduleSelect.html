@@ -1,0 +1,83 @@
+<template>
+	<div class="slds-grid slds-grid_vertical">
+
+		<div class="slds-scrollable_y" style="height: 300px" label='日時を選択してください'>
+			<lightning-datatable
+				key-field="id"
+				data={data}
+				columns={columns}
+				selected-rows={selectedRows}
+				onrowselection={handleRowSelection}>
+			</lightning-datatable>
+		</div>
+
+		<div class="slds-m-around_x-small slds-text-align_right">
+			<lightning-button label='前へ' variant="brand" onclick={back}
+				class="slds-var-p-around_xx-small"></lightning-button>
+			<lightning-button label='申込む' variant="brand" onclick={apply}
+				class="slds-var-p-around_xx-small"></lightning-button>
+		</div>
+	</div>
+
+	<template if:true={infoConfirm}>
+		<section
+			role="dialog"
+			tabindex="-1"
+			aria-labelledby="modal-heading-01"
+			aria-modal="true"
+			aria-describedby="modal-content-id-1"
+			class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<header class="slds-modal__header">
+					<h2
+						id="modal-heading-01"
+						class="slds-text-heading_medium slds-hyphenate">
+						お申し込み内容を確認してください
+					</h2>
+				</header>
+				<div
+					class="slds-modal__content slds-p-left_small"
+					id="modal-content-id-1">
+					<template if:true={seminarDetermine}>
+						<template for:each={applicationInfo} for:item="applicationInfo">
+							<p class="applicationInfo-item1" key={applicationInfo.Id}>
+								セミナ名：{applicationInfo.seminar__r.Name}
+							</p>
+							<p class="applicationInfo-item2" key={applicationInfo.Id}>
+								値段：{applicationInfo.seminar__r.Price__c}
+							</p>
+							<p class="applicationInfo-item3" key={applicationInfo.Id}>
+								形態：{applicationInfo.form__c}
+							</p>
+							<p class="applicationInfo-item4" key={applicationInfo.Id}>
+								開催地：{applicationInfo.Venue__c}
+							</p>
+							<p class="applicationInfo-item5" key={applicationInfo.Id}>
+								日時：{applicationInfo.DateTime__c}
+							</p>
+						</template>
+					</template>
+				</div>
+
+				<footer class="slds-modal__footer">
+					<p class="slds-p-left_small slds-text-align_left">合計：{totalAmount}</p>
+					<lightning-button class="slds-var-p-around_xx-small"
+						label="キャンセル"
+						onclick={close}
+						title="Cancel"
+						variant="brand">
+					</lightning-button>
+
+					<lightning-button class="slds-var-p-around_xx-small"
+						label="確認"
+						onclick={determine}
+						title="OK"
+						variant="brand">
+					</lightning-button>
+				</footer>
+
+			</div>
+		</section>
+
+	</template>
+</template>

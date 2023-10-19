@@ -14,7 +14,7 @@ import SEMINAR_FIELD from '@salesforce/schema/seminarScheduleManagement__c.semin
 
 
 
-export default class SeminarSehedual extends LightningElement {
+export default class seminarScheduleManagement extends LightningElement {
 	@api recordId;
 	scheduleObjId;
 
@@ -63,11 +63,11 @@ export default class SeminarSehedual extends LightningElement {
 		const recordInput = {apiName: SCHEDULEANAGEMENT_OBJECT.objectApiName,fields};
 		createRecord(recordInput)
 			.then((result) => {		
-				console.log('created success');
+				console.log('created successq');
         this.dispatchEvent(
 					new ShowToastEvent({
 							title: "Success",
-							message: "Account created successfully!",
+							message: "日程登録されました",
 							variant: "success"
 					})
 				);

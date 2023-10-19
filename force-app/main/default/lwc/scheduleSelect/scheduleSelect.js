@@ -12,9 +12,9 @@ import SEMINAR_FIELD from "@salesforce/schema/seminarScheduleManagement__c.semin
 import getinformation from "@salesforce/apex/recordController.getinformation";
 import searchEmployee from "@salesforce/apex/recordController.searchEmployee";
 import searchSeminar from "@salesforce/apex/recordController.searchSeminar";
-import getSeminarSchedule from "@salesforce/apex/seminarController.getSeminarSchedule";
-import getAppliInfo from "@salesforce/apex/seminarController.getAppliInfo";
-import createAttendanceHistory from "@salesforce/apex/seminarController.createAttendanceHistory";
+import getSeminarSchedule from "@salesforce/apex/recordController.getSeminarSchedule";
+import getAppliInfo from "@salesforce/apex/recordController.getAppliInfo";
+import createAttendanceHistory from "@salesforce/apex/recordController.createAttendanceHistory";
 
 
 
@@ -122,7 +122,6 @@ export default class ScheduleSelect extends LightningElement {
 		.catch((error) => {
 			this.dispatchEvent(
 				new ShowToastEvent({
-					title: "Error creating record",
 					message: error.body.message,
 					variant: "error"
 				})

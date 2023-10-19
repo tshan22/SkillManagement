@@ -5,8 +5,4 @@ trigger employeeTrigger on employee__c (before insert,after insert,before update
   } else if (Trigger.isUpdate && Trigger.isAfter) {
 		recordHandler.afterUpdate(Trigger.oldMap,Trigger.new);		
   }
-	
-	// else if(Trigger.isUpdate && Trigger.isBefore){
-	// 	recordHandler.afterInsert(Trigger.new);
-	// }
 }

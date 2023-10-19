@@ -1,6 +1,8 @@
 import Deferred from "./deferred";
 import Awaiter from "./awaiter";
 
+
+
 // SalesforceのSObjectを保存したときにトリムされるホワイトスペース
 const SF_WHITESPACE = "[\\x00-\\x20\\u1680\\u180E\\u2000-\\u2006\\u2008-\\u200A\\u2028\\u2029\\u205F\\u3000]";
 
@@ -427,6 +429,14 @@ function camelize(x) {
 // 	{label:'受講履歴',fieldName:'seminarHistory',format:(row)=>row.employees__r.seminarName__c + row.employees__r.ConcreteDateTime__c }
 // ]
 // 		return [SELECT id,Name,employeeName__r.Name,(SELECT seminarName__c,ConcreteDateTime__c FROM employees__r),OwnedCertification__c,Position__c FROM employee__c];
+// let arrayObj = [{key1:'value1', key2:'value2'},{key1:'value1', key2:'value2'}];
+
+// arrayObj = arrayObj.map(item => {
+//   return {
+//     stroke: item.key1,
+//     key2: item.key2
+//   };
+// });
 
 function toTable(records, columns) {
 	if (records == null) {
@@ -438,16 +448,7 @@ function toTable(records, columns) {
 			for (const e of columns) {
 					if (e.format) {
 							row[e.fieldName] = e.format(row);
-							console.log(e.fieldName,':',row[e.fieldName]);
-							
-							// if(e.fieldName == 'seminarHistory'){
-							// 	console.log('semihis:',e.format(row));
-							// 	const ff = row[e.fieldName];		
-							// 	console.log('ff:',ff)				
-							// 	for(let i =0;i<ff.length;i++){
-
-							// 	}		
-							// 	// row[e.fieldName] = ff.seminarName__c + ff.ConcreteDateTime__c							
+							console.log(e.fieldName,':',row[e.fieldName]);				
 						}
 			}
 			table.push(row);	

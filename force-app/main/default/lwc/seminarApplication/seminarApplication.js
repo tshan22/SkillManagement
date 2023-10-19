@@ -2,7 +2,7 @@
 
 import { LightningElement,api,wire} from 'lwc';
 import searchSeminar from "@salesforce/apex/recordController.searchSeminar";
-import getSeminarSchedule from "@salesforce/apex/seminarController.getSeminarSchedule";
+import getSeminarSchedule from "@salesforce/apex/recordController.getSeminarSchedule";
 import LightningAlert from 'lightning/alert';
 
 

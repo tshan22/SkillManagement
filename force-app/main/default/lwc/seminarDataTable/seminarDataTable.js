@@ -1,7 +1,7 @@
 
 
 import { LightningElement,api,wire} from 'lwc';
-import getSeminarSchedule from "@salesforce/apex/seminarController.getSeminarSchedule";
+import getSeminarSchedule from "@salesforce/apex/recordController.getSeminarSchedule";
 
 import NAME_FIELD from "@salesforce/schema/seminar__c.Name";
 import SEMINARNAME_FIELD from "@salesforce/schema/seminar__c.SeminaName__c";

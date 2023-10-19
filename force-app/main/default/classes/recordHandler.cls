@@ -6,14 +6,16 @@ public with sharing class recordHandler {
 		List<emCertificationRelation__c> newBridge = new List<emCertificationRelation__c>();
 		List<employee__c> employees = [SELECT Id, Name, OwnedCertification__c,employeeName__c FROM employee__c WHERE Id IN :newReocrds];
 		List<employee__Share> emShare = new List<employee__Share>();
-
+   
 		for(employee__c newList :employees) {
+			//従業員にアクセス権を付与する
 			emShare.add(new employee__Share(
 				ParentId = newList.id,
 				AccessLevel = 'Edit',
 				RowCause = 'Manual',
 				UserOrGroupId = newList.employeeName__c
 			));
+
 			if(newList.OwnedCertification__c == null){
 				continue;
 			}else if(newList.OwnedCertification__c.length()!= 0){
@@ -35,6 +37,7 @@ public with sharing class recordHandler {
 
   }
 
+	//保有資格を更新する際に、連結オブジェクトも更新する
 	public static void afterUpdate(Map<Id,employee__c> oldMap,List<employee__c> newReocrds) {
 
 		// List<employee__c> afterEmployees = [SELECT Id, Name, OwnedCertification__c FROM employee__c WHERE Id IN :newReocrds];
@@ -109,7 +112,7 @@ public with sharing class recordHandler {
 
 	}
 
-
+	//資格の更新期限を更新する場合、関連している従業員の「更新必要な資格有無」項目も更新される
 	public static void certificationUpdate(List<certification__c> updateRecords,Map<Id,certification__c> oldMap){
 		// Set<Id> ids = new Set<Id>();
 		List<certification__c> certifications = [SELECT id,Name,HasUpdate__c,UpdateDate__c,(SELECT Id, Name,employeeRelation__c,employeeRelation__r.Name,employeeRelation__r.HasUpdate__c,employeeRelation__r.UpdateCetifications__c,employeeRelation__r.UpdateDate__c FROM CertificationRelations__r) FROM certification__c WHERE id IN :updateRecords];
@@ -147,4 +150,59 @@ public with sharing class recordHandler {
     update certifications;
 		update em;
 	}
+
+  //受講履歴作されるたびに、関連している授業員「セミナ合計金額」が累積される
+	public static void semiHisAfterInsert(List<seminarAttendingHistory__c> newRecords){
+		List<seminarAttendingHistory__c> records = [SELECT Id, employeeId__c,employeeId__r.seminarAmount__c,employeeId__r.employeeName__c,Price__c FROM	seminarAttendingHistory__c WHERE id IN :newRecords];
+		List<employee__c> forUpdates = new List<employee__c>();
+
+		for(seminarAttendingHistory__c e :records){
+			employee__c em = e.employeeId__r;
+
+			//関連従業員のセミナ合計金額集計			
+			if(em.seminarAmount__c == null){
+				em.seminarAmount__c = 0;
+			}
+			em.seminarAmount__c += e.Price__c;
+			forUpdates.add(em);
+		}
+		update forUpdates;
+	}
+
+	//受講履歴作成たれるたびに、新規行動が登録されます
+	public static void newEventCreated(List<seminarAttendingHistory__c> newRecords){
+		List<seminarAttendingHistory__c> records = [SELECT Id,Name,Form__c,Venue__c,seminarName__c,seminarName__r.Name,employeeId__c,EmployeeName__c,employeeId__r.Name,employeeId__r.employeeName__c,ConcreteDateTime__c,Status__c FROM seminarAttendingHistory__c WHERE id IN :newRecords];
+		List<Event> newEvent = new List<Event>();
+
+		for(seminarAttendingHistory__c r :records){
+			employee__c em = r.employeeId__r;
+			String con = r.ConcreteDateTime__c;
+			String st = con.substring(0, 10) +' ' + con.substring(14, 22);
+			String et = con.substring(0, 10) +' ' + con.substring(23);
+			Datetime startTime = Datetime.valueOfGMT(st);
+			Datetime endTime = Datetime.valueOfGMT(et);
+			if(r.Form__c == 'オンライン'){
+				newEvent.add(new Event(
+					Subject = '受講予定:' + r.seminarName__r.Name,
+					StartDateTime = startTime,
+					EndDateTime = endTime,
+					WhatId = r.employeeId__c,
+					Location = r.Form__c
+				));
+			}else {
+				newEvent.add(new Event(
+					Subject = '受講予定',
+					StartDateTime = startTime,
+					EndDateTime = endTime,
+					WhatId = r.employeeId__c,
+					Location = r.Venue__c
+				));
+			}
+			
+		}
+		insert newEvent;
+	}
+	
+
+
 }

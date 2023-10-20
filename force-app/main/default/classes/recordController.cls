@@ -25,19 +25,19 @@ public with sharing class recordController {
 	}
 
 	//受講履歴を取得する
-	@AuraEnabled(cacheable=true)
-	public static List<seminarAttendingHistory__c> getSeminarHistoryinfo(String inputName){
-		String fields = '%' + inputName + '%';
-    return [
-      SELECT
-				id,
-        Name,
-				ConcreteDateTime__c,
-				employeeId__c,
-				seminarName__c	
-      FROM  seminarAttendingHistory__c  
-    ];	
-	}
+	// @AuraEnabled(cacheable=true)
+	// public static List<seminarAttendingHistory__c> getSeminarHistoryinfo(String inputName){
+	// 	String fields = '%' + inputName + '%';
+  //   return [
+  //     SELECT
+	// 			id,
+  //       Name,
+	// 			ConcreteDateTime__c,
+	// 			employeeId__c,
+	// 			seminarName__c	
+  //     FROM  seminarAttendingHistory__c  
+  //   ];	
+	// }
 
 	//セミナ情報を取得する
 	@AuraEnabled(cacheable=true)
@@ -57,15 +57,14 @@ public with sharing class recordController {
 
 	//資格情報を取得する
 	@AuraEnabled(cacheable=true)
-	public static certification__c getCertificationInfos(String name){
+	public static certification__c getCertificationInfos(String inputName){
 
 		return [
 			SELECT 
 				id,
-				Name,	
-				CertificationClassification__c 
+				Name
 			FROM certification__c
-			WHERE Name =: name
+			WHERE Name =: inputName
 			LIMIT 1];		
 	}
 	

@@ -2,7 +2,7 @@ public with sharing class recordController {
 	//従業員情報を取得する
 	@AuraEnabled(cacheable=true)
 	public static List<employee__c> getinformation(){
-		return [SELECT id,Name,employeeName__r.Name,(SELECT seminarName__c,ConcreteDateTime__c FROM employees__r),OwnedCertification__c,Position__c FROM employee__c];
+		return [SELECT id,Name,employeeName__r.Name,(SELECT seminarName__c,seminarName__r.Name,ConcreteDateTime__c FROM employees__r),OwnedCertification__c,Position__c FROM employee__c];
     // return [SELECT id,Name,employeeName__r.Name AS 'employeeNam',(SELECT seminarName__c,ConcreteDateTime__c FROM employees__r),OwnedCertification__c,Position__c FROM employee__c];    
   }
 
@@ -64,7 +64,7 @@ public with sharing class recordController {
 				id,
 				Name
 			FROM certification__c
-			WHERE Name =: inputName
+			WHERE Name = :inputName
 			LIMIT 1];		
 	}
 	

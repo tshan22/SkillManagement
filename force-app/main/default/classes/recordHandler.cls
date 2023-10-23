@@ -21,11 +21,14 @@ public with sharing class recordHandler {
 			}else if(newList.OwnedCertification__c.length()!= 0){
 				List<String> lists = newList.OwnedCertification__c.split(';');
 				for(Integer i = 0;i<lists.size();i++){
-					certification__c cfInfos = recordController.getCertificationInfos(lists[i]);					
-					newBridge.add(new emCertificationRelation__c(
-						employeeRelation__c = newList.Id,
-						CertificationRelation__c = cfInfos.Id)
-					);
+					certification__c cfInfos = recordController.getCertificationInfos(lists[i]);			
+					if(cfInfos.Id != null){
+						newBridge.add(new emCertificationRelation__c(
+							employeeRelation__c = newList.Id,
+							CertificationRelation__c = cfInfos.Id)
+						);
+					}		
+					
 				}	
 			}
 		}
@@ -54,7 +57,7 @@ public with sharing class recordHandler {
 		for(employee__c newList :newReocrds) {
 
 			if(oldMap.get(newList.Id).OwnedCertification__c == null && newList.OwnedCertification__c != null){
-				List<String> afterLists = newList.OwnedCertification__c.split(';',22);
+				List<String> afterLists = newList.OwnedCertification__c.split(';');
 				for(Integer i = 0;i<afterLists.size();i++){
 					certification__c cfInfos = recordController.getCertificationInfos(afterLists[i]);	
 					emCertificationRelation__c bridgeInfos = new emCertificationRelation__c(employeeRelation__c = newList.Id,CertificationRelation__c = cfInfos.Id);
@@ -62,8 +65,8 @@ public with sharing class recordHandler {
 					newBridge.add(bridgeInfos);	
 				}					
 			}else if(oldMap.get(newList.Id).OwnedCertification__c != null && newList.OwnedCertification__c != null){
-					List<String> afterLists = newList.OwnedCertification__c.split(';',22);
-					List<String> oldLists = oldMap.get(newList.Id).OwnedCertification__c.split(';',22);
+					List<String> afterLists = newList.OwnedCertification__c.split(';');
+					List<String> oldLists = oldMap.get(newList.Id).OwnedCertification__c.split(';');
 					// beforeEmployees.add(oldMap.get(newList.id));
 
 				for(Integer i = 0;i<oldLists.size();i++){
@@ -91,15 +94,13 @@ public with sharing class recordHandler {
 					}
 				}
 			}else if(oldMap.get(newList.Id).OwnedCertification__c != null && newList.OwnedCertification__c == null){
-				List<String> oldLists = oldMap.get(newList.Id).OwnedCertification__c.split(';',22);
+				List<String> oldLists = oldMap.get(newList.Id).OwnedCertification__c.split(';');
 
 				for(Integer i = 0;i<oldLists.size();i++){
 					certification__c cfInfos = recordController.getCertificationInfos(oldLists[i]);	
 					emCertificationRelation__c bridgeInfos = recordController.getBridgeInfos(oldMap.get(newList.id).Id,cfInfos.Id);
 					deleteRecords.add(bridgeInfos);
 				}
-			}else{
-				continue;
 			}
 		}
 
@@ -191,7 +192,7 @@ public with sharing class recordHandler {
 				));
 			}else {
 				newEvent.add(new Event(
-					Subject = '受講予定',
+					Subject = '受講予定:' + r.seminarName__r.Name,
 					StartDateTime = startTime,
 					EndDateTime = endTime,
 					WhatId = r.employeeId__c,

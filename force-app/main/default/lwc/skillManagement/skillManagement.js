@@ -17,8 +17,9 @@ const col = [
 	{label : '従業員名',fieldName: 'employeeName',format: (row) => row.employeeName__r.Name},
 	{label: '役割',fieldName:POSITION_FIELD.fieldApiName},
 	{label : '保有資格',fieldName: CERTIFICATION_FIELD.fieldApiName},
-	{label:'受講履歴',fieldName:'seminarHistory',format:(row) => row.employees__r}
+	{label:'受講履歴',fieldName:'seminarHistory'}
 ]
+
 
 export default class skillManagement extends LightningElement {
 	fieldValue;
@@ -29,19 +30,26 @@ export default class skillManagement extends LightningElement {
 	//data
 	@wire(getinformation)
 	wiredEmployeeInfos(result) {
+		const seminarHistory = null;
+		const all = null;
 		if (result.data) {
-			this.data = toTable(result.data,this.columns);
-			console.log('data:',JSON.stringify(this.data));
-		} else if (result.error) {
+			console.log('length:',result.data.length);
+			 all =	result.data.map((item)=>{				
+				let employeedata = item.employees__r;
+				if(!employeedata == null){
+					  seminarHistory = employeedata.map((sub_item)=>{
+						sub_item.seminarName__r.Name + ':' +sub_item.ConcreteDateTime__c
+					})
+				}
+			})
+			this.data= toTable(all,this.columns);
+		 	return {...item, seminarHistory: seminarHistory.join('')};
+			
+		}else {
 			console.log('error');
 		}
-	}
-	// async connectedCallback(){
-	// 	this.data =  await getinformation();
-	// 	console.log('dataddada:',this.data);
-	// }
-
 	
+	}
 
 	handleChange(event){
 		this.fieldValue = event.target.value;		
@@ -56,30 +64,8 @@ export default class skillManagement extends LightningElement {
 		});
 	}
 
-	// toSearchResultPage(){
-	// 	searchEmployee({ inputName: this.fieldValue})
-	// 	.then((result) => {
-	// 		console.log('result:',result);
-	// 		this.data = toTable(result,this.columns);
-	// 		console.log('datadata:',this.data);
-	// 	})
-	// 	.catch(() => {
-	// 		console.log('error');
-	// 	});
-
 }
 
-
-
-
-
-
-
-
-	// toSearchResultPage(){
-	// 	this.resultPage = true;	
-	// 	this.template.querySelector('c-search-result-page').searchResult();
-	// }
 
 
 

@@ -1,7 +1,6 @@
 public without sharing class schedualCreateTask implements Schedulable {
 	 
   public void execute(SchedulableContext ctx) {
-    List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
 
 		Date schedualDate = date.today().addMonths(2);
 

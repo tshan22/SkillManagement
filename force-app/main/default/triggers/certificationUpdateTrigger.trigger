@@ -3,5 +3,4 @@ trigger certificationUpdateTrigger on certification__c (after update) {
 			recordHandler.triggerCalled = true;
 			recordHandler.certificationUpdate(Trigger.new,Trigger.oldMap);
 		}
-
 }

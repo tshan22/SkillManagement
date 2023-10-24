@@ -42,7 +42,7 @@ export default class skillManagement extends LightningElement {
 					});
 					// console.log(JSON.stringify(this.seminarHistory));					
 				}else if(!employeedata){
-					console.log('33333');
+					// console.log('33333');
 					this.seminarHistory = '';
 					console.log(this.seminarHistory.length);				
 				}
@@ -55,11 +55,9 @@ export default class skillManagement extends LightningElement {
 					return {...item, seminarHistory: this.seminarHistory};
 
 				}
-									// return {...item, seminarHistory: this.seminarHistory.join('\n')};
 		})
 		console.log('all:',JSON.stringify(this.all));
 		this.data = toTable(this.all,this.columns);
-		// console.log('all:',all);
 	}
 
 	handleChange(event){

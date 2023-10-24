@@ -1,6 +1,6 @@
 
 
-import { LightningElement,api,wire} from 'lwc';
+import { LightningElement,api,wire,track} from 'lwc';
 import getinformation from "@salesforce/apex/recordController.getinformation";
 import searchEmployee from "@salesforce/apex/recordController.searchEmployee";
 
@@ -26,29 +26,40 @@ export default class skillManagement extends LightningElement {
 	columns = col;
 	data;	
 	// resultPage = false;
+	@track seminarHistory;
+	@track all;
 
 	//data
-	@wire(getinformation)
-	wiredEmployeeInfos(result) {
-		const seminarHistory = null;
-		const all = null;
-		if (result.data) {
-			console.log('length:',result.data.length);
-			 all =	result.data.map((item)=>{				
-				let employeedata = item.employees__r;
-				if(!employeedata == null){
-					  seminarHistory = employeedata.map((sub_item)=>{
-						sub_item.seminarName__r.Name + ':' +sub_item.ConcreteDateTime__c
-					})
+	async connectedCallback(){
+		const employeeInfo = await getinformation();
+		console.log('data',employeeInfo);
+		this.all = employeeInfo.map((item)=>{
+				const employeedata = item.employees__r;
+				console.log('emdata:',employeedata);
+				if(employeedata){	
+					  this.seminarHistory =  employeedata.map(element => {
+						return element.seminarName__r.Name + ':' +element.ConcreteDateTime__c	;							
+					});
+					// console.log(JSON.stringify(this.seminarHistory));					
+				}else if(!employeedata){
+					console.log('33333');
+					this.seminarHistory = '';
+					console.log(this.seminarHistory.length);				
 				}
-			})
-			this.data= toTable(all,this.columns);
-		 	return {...item, seminarHistory: seminarHistory.join('')};
-			
-		}else {
-			console.log('error');
-		}
-	
+				if(this.seminarHistory.length >0){
+					console.log('seminarHistory:',this.seminarHistory.join('\n'));
+					return {...item, seminarHistory: this.seminarHistory.join('\n')};
+
+				}else if(this.seminarHistory.length == 0){
+					console.log('seminarHistory:',this.seminarHistory);
+					return {...item, seminarHistory: this.seminarHistory};
+
+				}
+									// return {...item, seminarHistory: this.seminarHistory.join('\n')};
+		})
+		console.log('all:',JSON.stringify(this.all));
+		this.data = toTable(this.all,this.columns);
+		// console.log('all:',all);
 	}
 
 	handleChange(event){
@@ -59,8 +70,8 @@ export default class skillManagement extends LightningElement {
 			this.data = toTable(result,this.columns);
 			console.log('datadata:',this.data);
 		})
-		.catch(() => {
-			console.log('error');
+		.catch((error) => {
+			console.log(error);
 		});
 	}
 

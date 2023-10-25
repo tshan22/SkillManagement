@@ -25,7 +25,6 @@ public class recordContorllerTest {
 		insert cfs;
 
 	 //テストデータ：従業員の追加
-	//  User user = [SELECT id,name FROM User WHERE  Username = 'shanting0210@yahoo.co.jp' LIMIT 1];
 		employee__c em1 = new employee__c();
 		em1.employeeName__c = testUser.id;
 		em1.Position__c = '一般';

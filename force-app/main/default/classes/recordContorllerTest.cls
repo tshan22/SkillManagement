@@ -48,7 +48,6 @@ public class recordContorllerTest {
 		sch.TimeFrom__c =Time.newInstance(10,00,0,0);
 		sch.TimeEnd__c = Time.newInstance(12,00,0,0);
 		insert sch;
-		
 	}
 
 
@@ -124,6 +123,7 @@ public class recordContorllerTest {
 		System.assertNotEquals(0, getAppInfo.size());
 	}
 
+
 	@isTest
 	static void createAttendanceHistoryTest(){
 		User u =[SELECT id,name FROM User WHERE  Username = 'shanting0210@yahoo.co.jp'];
@@ -137,6 +137,7 @@ public class recordContorllerTest {
 			List<seminarAttendingHistory__c> resultList =[SELECT id,Name FROM seminarAttendingHistory__c];
 			System.Test.stopTest();
 			System.assertEquals(1, resultList.size());
+
 		}
 
 

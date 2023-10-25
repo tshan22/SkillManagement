@@ -27,8 +27,7 @@ public with sharing class recordHandler {
 							employeeRelation__c = newList.Id,
 							CertificationRelation__c = cfInfos.Id)
 						);
-					}		
-					
+					}					
 				}	
 			}
 		}
@@ -37,23 +36,14 @@ public with sharing class recordHandler {
 			insert newBridge;
 		}
 		insert emShare;
-
   }
 
 	//保有資格を更新する際に、連結オブジェクトも更新する
 	public static void afterUpdate(Map<Id,employee__c> oldMap,List<employee__c> newReocrds) {
-
-		// List<employee__c> afterEmployees = [SELECT Id, Name, OwnedCertification__c FROM employee__c WHERE Id IN :newReocrds];
-
-		// List<employee__c> beforeEmployees = new List<employee__c>();
-
-		// List<emCertificationRelation__c> bridge = new List<emCertificationRelation__c>();
 		List<emCertificationRelation__c> newBridge = new List<emCertificationRelation__c>();
 		List<emCertificationRelation__c> deleteRecords = new List<emCertificationRelation__c>();
 
 		List<Id> ids = new List<Id>();
-
-
 		for(employee__c newList :newReocrds) {
 
 			if(oldMap.get(newList.Id).OwnedCertification__c == null && newList.OwnedCertification__c != null){
@@ -67,12 +57,12 @@ public with sharing class recordHandler {
 			}else if(oldMap.get(newList.Id).OwnedCertification__c != null && newList.OwnedCertification__c != null){
 					List<String> afterLists = newList.OwnedCertification__c.split(';');
 					List<String> oldLists = oldMap.get(newList.Id).OwnedCertification__c.split(';');
-					// beforeEmployees.add(oldMap.get(newList.id));
+					
 
 				for(Integer i = 0;i<oldLists.size();i++){
 					certification__c cfInfos = recordController.getCertificationInfos(oldLists[i]);	
 					emCertificationRelation__c bridgeInfos = recordController.getBridgeInfos(oldMap.get(newList.id).Id,cfInfos.Id);
-					// bridge.add(bridgeInfos);
+				
 					ids.add(bridgeInfos.CertificationRelation__c);
 
 					if(!afterLists.contains(oldLists[i])){
@@ -84,13 +74,8 @@ public with sharing class recordHandler {
 					certification__c cfInfos = recordController.getCertificationInfos(afterLists[i]);		
 
 					emCertificationRelation__c bridgeInfos = new emCertificationRelation__c(employeeRelation__c = newList.Id,CertificationRelation__c = cfInfos.Id);
-					// System.debug('s');
-
-					if(!ids.contains(bridgeInfos.CertificationRelation__c)){
+						if(!ids.contains(bridgeInfos.CertificationRelation__c)){
 						newBridge.add(bridgeInfos);
-
-							// employeeRelation__c = newList.Id,
-							// CertificationRelation__c = cfInfos.Id)
 					}
 				}
 			}else if(oldMap.get(newList.Id).OwnedCertification__c != null && newList.OwnedCertification__c == null){
@@ -124,30 +109,12 @@ public with sharing class recordHandler {
 			if(u.UpdateDate__c !=null && u.UpdateDate__c != oldMap.get(u.id).UpdateDate__c){				
 				u.HasUpdate__c = '必要';
 				for(emCertificationRelation__c ecf: u.CertificationRelations__r){
-						em.add(ecf.employeeRelation__r);
-					// ids.add(ecf.employeeRelation__c);
+					em.add(ecf.employeeRelation__r);
 					ecf.employeeRelation__r.HasUpdate__c = '有り';
-
-					//従業員「更新必要な資格」項目、複数選択クリストの追加、更新
-					// if(ecf.employeeRelation__r.UpdateCetifications__c == null){
-					// 	ecf.employeeRelation__r.UpdateCetifications__c = ' ';
-					// }
-					// ecf.employeeRelation__r.UpdateCetifications__c += ';' + u.Name;
-
-					//従業員「更新期限」項目 ロングテキストエリア、エラー
-					// String updateDate = String.valueOf(u.UpdateDate__c);
-					// if(ecf.employeeRelation__r.UpdateDates__c == null){
-					// 	ecf.employeeRelation__r.UpdateDates__c = ' ';
-					// }
-					// ecf.employeeRelation__r.UpdateDates__c += ';'+ u.Name + ':'+ updateDate;
 				}	
 			}
 		}
 
-		// List<employee__c> em = [SELECT Id,Name,HasUpdate__c,UpdateDate__c,employeeName__c FROM employee__c WHERE id IN :ids];
-		// for(employee__c e : em){
-		// 	e.HasUpdate__c = '有り';
-		// }
     update certifications;
 		update em;
 	}
@@ -172,14 +139,13 @@ public with sharing class recordHandler {
 
 	//受講履歴作成たれるたびに、新規行動が登録されます
 	public static void newEventCreated(List<seminarAttendingHistory__c> newRecords){
-		List<seminarAttendingHistory__c> records = [SELECT Id,Name,Form__c,Venue__c,seminarName__c,seminarName__r.Name,employeeId__c,EmployeeName__c,employeeId__r.Name,employeeId__r.employeeName__c,ConcreteDateTime__c,Status__c FROM seminarAttendingHistory__c WHERE id IN :newRecords];
+		List<seminarAttendingHistory__c> records = [SELECT Id,Name,Form__c,Venue__c,seminarName__c, Date__c,TimeFrom__c,TimeEnd__c,seminarName__r.Name,employeeId__c,EmployeeName__c,employeeId__r.Name,employeeId__r.employeeName__c,ConcreteDateTime__c,Status__c FROM seminarAttendingHistory__c WHERE id IN :newRecords];
 		List<Event> newEvent = new List<Event>();
 
 		for(seminarAttendingHistory__c r :records){
-			employee__c em = r.employeeId__r;
-			String con = r.ConcreteDateTime__c;
-			String st = con.substring(0, 10) +' ' + con.substring(14, 22);
-			String et = con.substring(0, 10) +' ' + con.substring(23);
+			String st = String.valueof(r.Date__c) + ' ' + String.valueof(r.TimeFrom__c);
+      String et = String.valueof(r.Date__c) + ' ' + String.valueof(r.TimeEnd__c);
+			
 			Datetime startTime = Datetime.valueOfGMT(st);
 			Datetime endTime = Datetime.valueOfGMT(et);
 			if(r.Form__c == 'オンライン'){

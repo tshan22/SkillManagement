@@ -136,7 +136,6 @@ public class recordContorllerTest {
 			List<seminarAttendingHistory__c> resultList =[SELECT id,Name FROM seminarAttendingHistory__c];
 			System.Test.stopTest();
 			System.assertEquals(1, resultList.size());
-
 		}
 
 

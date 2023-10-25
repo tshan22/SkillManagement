@@ -1,5 +1,5 @@
 
-trigger employeeTrigger on employee__c (before insert,after insert,before update,after update,before delete) {
+trigger employeeTrigger on employee__c (after insert,after update) {
   if(Trigger.isInsert && Trigger.isAfter) {
     recordHandler.afterInsert(Trigger.new);		
   } else if (Trigger.isUpdate && Trigger.isAfter) {

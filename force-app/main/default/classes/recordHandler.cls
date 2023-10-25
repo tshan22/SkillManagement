@@ -104,7 +104,6 @@ public with sharing class recordHandler {
 		List<certification__c> certifications = [SELECT id,Name,HasUpdate__c,UpdateDate__c,(SELECT Id, Name,employeeRelation__c,employeeRelation__r.Name,employeeRelation__r.HasUpdate__c,employeeRelation__r.UpdateCetifications__c,employeeRelation__r.UpdateDate__c FROM CertificationRelations__r) FROM certification__c WHERE id IN :updateRecords];
 		List<employee__c> em = new List<employee__c>();
 
-
 		for(certification__c u : certifications){
 			if(u.UpdateDate__c !=null && u.UpdateDate__c != oldMap.get(u.id).UpdateDate__c){				
 				u.HasUpdate__c = '必要';
@@ -145,7 +144,6 @@ public with sharing class recordHandler {
 		for(seminarAttendingHistory__c r :records){
 			String st = String.valueof(r.Date__c) + ' ' + String.valueof(r.TimeFrom__c);
       String et = String.valueof(r.Date__c) + ' ' + String.valueof(r.TimeEnd__c);
-			
 			Datetime startTime = Datetime.valueOfGMT(st);
 			Datetime endTime = Datetime.valueOfGMT(et);
 			if(r.Form__c == 'オンライン'){

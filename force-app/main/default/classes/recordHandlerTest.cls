@@ -208,7 +208,7 @@ public class recordHandlerTest {
 	static void semiHisAfterInsertTest(){
 		User u =[SELECT id,name FROM User WHERE  Username = 'shanting0210@yahoo.co.jp'];
 		seminar__c semi = [SELECT id,Name,Price__c FROM seminar__c WHERE Name = 'Python 入門' LIMIT 1];
-		seminarScheduleManagement__c schInfo = [SELECT id,Name,seminar__c,seminar__r.Price__c,DateTime__c,Form__c,Venue__c FROM seminarScheduleManagement__c WHERE seminar__c =: semi.id LIMIT 1];
+		seminarScheduleManagement__c schInfo = [SELECT id,Name,seminar__c,Date__c,TimeFrom__c,TimeEnd__c,seminar__r.Price__c,DateTime__c,Form__c,Venue__c FROM seminarScheduleManagement__c WHERE seminar__c =: semi.id LIMIT 1];
 
 		System.Test.startTest();
 		employee__c em7 = new employee__c();
@@ -216,12 +216,16 @@ public class recordHandlerTest {
 		em7.Position__c = '一般';
 		em7.OwnedCertification__c = 'Developer;LWC';
 		insert em7;
+
 		seminarAttendingHistory__c sh = new seminarAttendingHistory__c();
 		sh.seminarName__c = semi.id;
 		sh.employeeId__c = em7.id;
 		sh.Price__c = semi.Price__c;
 		sh.Form__c = schInfo.Form__c;
 		sh.Venue__c = schInfo.Venue__c;
+		sh.Date__c = schInfo.Date__c;
+		sh.TimeFrom__c = schInfo.TimeFrom__c;
+		sh.TimeEnd__c = schInfo.TimeFrom__c;
 		sh.ConcreteDateTime__c = schInfo.DateTime__c;
 		insert sh;
 
@@ -257,7 +261,7 @@ public class recordHandlerTest {
 		sch.TimeEnd__c = Time.newInstance(12,00,0,0);
 		insert sch;
 
-		seminarScheduleManagement__c schInfo =[SELECT id,Name,form__c,Venue__c,DateTime__c FROM seminarScheduleManagement__c WHERE form__c='オフライン' LIMIT 1];
+		seminarScheduleManagement__c schInfo =[SELECT id,Name,form__c,Venue__c,Date__c,TimeFrom__c,TimeEnd__c,DateTime__c FROM seminarScheduleManagement__c WHERE form__c='オフライン' LIMIT 1];
 
 		seminarAttendingHistory__c sh = new seminarAttendingHistory__c();
 		sh.seminarName__c = semi.id;
@@ -265,6 +269,9 @@ public class recordHandlerTest {
 		sh.Price__c = semi.Price__c;
 		sh.Form__c = schInfo.Form__c;
 		sh.Venue__c = schInfo.Venue__c;
+		sh.Date__c = schInfo.Date__c;
+		sh.TimeFrom__c = schInfo.TimeFrom__c;
+		sh.TimeEnd__c = schInfo.TimeEnd__c;
 		sh.ConcreteDateTime__c = schInfo.DateTime__c;
 		insert sh;
 

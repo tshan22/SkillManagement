@@ -49,15 +49,6 @@ public class recordContorllerTest {
 		sch.TimeEnd__c = Time.newInstance(12,00,0,0);
 		insert sch;
 		
-		//テストデータ：受講履歴追加
-		seminarScheduleManagement__c schInfo =[SELECT id,Name,Form__c,DateTime__c FROM seminarScheduleManagement__c WHERE id=:sch.id]; 
-		seminarAttendingHistory__c sh = new seminarAttendingHistory__c();
-		sh.seminarName__c = s.id;
-		sh.employeeId__c = em1.id;
-		sh.Price__c = s.Price__c;
-		sh.Form__c = schInfo.Form__c;
-		sh.ConcreteDateTime__c = schInfo.DateTime__c;
-		insert sh;
 	}
 
 
@@ -133,19 +124,19 @@ public class recordContorllerTest {
 		System.assertNotEquals(0, getAppInfo.size());
 	}
 
-		@isTest
+	@isTest
 	static void createAttendanceHistoryTest(){
 		User u =[SELECT id,name FROM User WHERE  Username = 'shanting0210@yahoo.co.jp'];
 		System.Test.startTest();		
 		System.runAs(u){
 			employee__c em= [SELECT id,name,employeeName__r.Name FROM employee__c WHERE employeeName__c =: u.id LIMIT 1];
 			seminar__c semi = [SELECT id,Name,Price__c FROM seminar__c WHERE Name='Python 入門' LIMIT 1];		
-			List<seminarScheduleManagement__c> semiSch = [SELECT id,Name,seminar__c,seminar__r.Price__c,DateTime__c,TimeFrom__c,TimeEnd__c, form__c,Venue__c FROM seminarScheduleManagement__c WHERE seminar__c =:semi.id AND DateTime__c ='2013-11-11(月),10:00:00~12:00:00' AND form__c = 'オンライン'];
+			List<seminarScheduleManagement__c> semiSch = [SELECT id,Name,seminar__c,seminar__r.Price__c,DateTime__c,Date__c,TimeFrom__c,TimeEnd__c, form__c,Venue__c FROM seminarScheduleManagement__c WHERE seminar__c =:semi.id AND DateTime__c ='2013-11-11(月),10:00:00~12:00:00' AND form__c = 'オンライン'];
 
 			recordController.createAttendanceHistory(semiSch);
 			List<seminarAttendingHistory__c> resultList =[SELECT id,Name FROM seminarAttendingHistory__c];
 			System.Test.stopTest();
-			System.assertEquals(2, resultList.size());
+			System.assertEquals(1, resultList.size());
 		}
 
 

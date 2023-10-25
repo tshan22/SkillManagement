@@ -144,8 +144,7 @@ public with sharing class recordHandler {
 
 		for(seminarAttendingHistory__c r :records){
 			String st = String.valueof(r.Date__c) + ' ' + String.valueof(r.TimeFrom__c);
-      String et = String.valueof(r.Date__c) + ' ' + String.valueof(r.TimeEnd__c);
-			
+      String et = String.valueof(r.Date__c) + ' ' + String.valueof(r.TimeEnd__c);			
 			Datetime startTime = Datetime.valueOfGMT(st);
 			Datetime endTime = Datetime.valueOfGMT(et);
 			if(r.Form__c == 'オンライン'){

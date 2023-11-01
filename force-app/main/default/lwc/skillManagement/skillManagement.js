@@ -1,17 +1,11 @@
 
 
-import { LightningElement,api,wire,track} from 'lwc';
+import { LightningElement,track} from 'lwc';
 import getinformation from "@salesforce/apex/recordController.getinformation";
 import searchEmployee from "@salesforce/apex/recordController.searchEmployee";
-
-import NAME_FIELD from "@salesforce/schema/employee__c.Name";
 import POSITION_FIELD from "@salesforce/schema/employee__c.Position__c";
 import CERTIFICATION_FIELD from "@salesforce/schema/employee__c.OwnedCertification__c";
-import EMPLOYEENAME_FIELD from "@salesforce/schema/employee__c.employeeName__c";
 import {toTable} from "c/util";
-
-
-
 
 const col = [
 	{label : '従業員名',fieldName: 'employeeName',format: (row) => row.employeeName__r.Name},
@@ -19,8 +13,6 @@ const col = [
 	{label : '保有資格',fieldName: CERTIFICATION_FIELD.fieldApiName},
 	{label:'受講履歴',fieldName:'seminarHistory'}
 ]
-
-
 export default class skillManagement extends LightningElement {
 	fieldValue;
 	columns = col;
@@ -42,21 +34,19 @@ export default class skillManagement extends LightningElement {
 					});
 					// console.log(JSON.stringify(this.seminarHistory));					
 				}else if(!employeedata){
-					// console.log('33333');
 					this.seminarHistory = '';
 					console.log(this.seminarHistory.length);				
 				}
 				if(this.seminarHistory.length >0){
 					console.log('seminarHistory:',this.seminarHistory.join('\n'));
 					return {...item, seminarHistory: this.seminarHistory.join('\n')};
-
 				}else if(this.seminarHistory.length == 0){
 					console.log('seminarHistory:',this.seminarHistory);
 					return {...item, seminarHistory: this.seminarHistory};
 
 				}
 		})
-		console.log('all:',JSON.stringify(this.all));
+		// console.log('all:',JSON.stringify(this.all));
 		this.data = toTable(this.all,this.columns);
 	}
 

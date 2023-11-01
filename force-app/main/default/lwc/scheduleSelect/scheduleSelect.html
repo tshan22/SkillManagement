@@ -19,6 +19,8 @@
 		</div>
 	</div>
 
+	<!-- -->
+
 	<template if:true={infoConfirm}>
 		<section
 			role="dialog"
@@ -28,15 +30,11 @@
 			aria-describedby="modal-content-id-1"
 			class="slds-modal slds-fade-in-open">
 			<div class="slds-modal__container">
-				<header class="slds-modal__header">
-					<h2
-						id="modal-heading-01"
-						class="slds-text-heading_medium slds-hyphenate">
-						お申し込み内容を確認してください
-					</h2>
-				</header>
-				<div
-					class="slds-modal__content slds-p-left_small"
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">お申し込み内容を確認してください</h1>
+				</div>
+
+				<div class="slds-modal__content slds-p-around_medium"
 					id="modal-content-id-1">
 					<template if:true={seminarDetermine}>
 						<template for:each={applicationInfo} for:item="applicationInfo">
